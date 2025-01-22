@@ -56,7 +56,7 @@ jobs:
         run: ./vendor/bin/phpstan
       - name: Run tests without coverage
         working-directory: packages/${{ matrix.package-path }}
-        run: ./vendor/bin/phpunit
+        run: ./vendor/bin/phpunit --no-coverage
 
   code-coverage:
     runs-on: ubuntu-latest
