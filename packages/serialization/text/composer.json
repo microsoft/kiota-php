@@ -1,12 +1,22 @@
 {
     "name": "microsoft/kiota-serialization-text",
     "description": "Implementation of Serialization Abstractions for text/plain content",
+	"version": "1.1.0",
     "type": "library",
     "license": "MIT",
     "authors": [
         {
             "name": "Microsoft Graph Client Tooling",
             "email": "graphtooling@service.microsoft.com"
+        }
+    ],
+	"repositories": [
+        {
+            "type": "path",
+            "url": "../../abstractions",
+            "options": {
+                    "symlink": false
+            }
         }
     ],
     "require": {
