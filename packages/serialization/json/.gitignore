@@ -1,0 +1,8 @@
+vendor
+coverage
+composer.lock
+composer.phar
+.phpunit.result.cache
+.phpdoc/
+.idea/
+.vscode/
