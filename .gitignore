@@ -6,3 +6,7 @@ composer.lock
 tests/Functional/TestConstants.php
 .phpunit.result.cache
 .phpdoc/
+**/coverage.xml
+**/*-coverage.xml
+
+

@@ -12,6 +12,7 @@
 		"php": "^7.4 || ^8.0"
 	},
     "require-dev": {
-		"symplify/monorepo-builder": "^11.2.22"
+		"symplify/monorepo-builder": "^11.2.22",
+		"phpunit/phpunit": "^9.6.22"
 	}
 }
