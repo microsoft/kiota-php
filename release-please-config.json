@@ -15,7 +15,7 @@
 	"packages": {
 		"packages/abstractions": {
 			"package-name": "microsoft/kiota-abstractions",
-			"component": "abstractions",
+			"component": "microsoft-abstractions",
 			"changelog-path": "CHANGELOG.md",
 			"release-type": "simple",
 			"extra-files": [
@@ -25,7 +25,7 @@
 		},
 		"packages/authentication/phpleague": {
 			"package-name": "microsoft/kiota-authentication-phpleague",
-			"component": "authentication-phpleague",
+			"component": "microsoft-authentication-phpleague",
 			"changelog-path": "CHANGELOG.md",
 			"release-type": "simple",
 			"extra-files": [
@@ -40,7 +40,7 @@
 		},
 		"packages/http/guzzle": {
 			"package-name": "microsoft/kiota-http-guzzle",
-			"component": "http-guzzle",
+			"component": "microsoft-http-guzzle",
 			"changelog-path": "CHANGELOG.md",
 			"release-type": "simple",
 			"extra-files": [
@@ -55,7 +55,7 @@
 		},
 		"packages/serialization/form": {
 			"package-name": "microsoft/kiota-serialization-form",
-			"component": "serialization-form",
+			"component": "microsoft-serialization-form",
 			"changelog-path": "CHANGELOG.md",
 			"release-type": "simple",
 			"extra-files": [
@@ -70,7 +70,7 @@
 		},
 		"packages/serialization/json": {
 			"package-name": "microsoft/kiota-serialization-json",
-			"component": "serialization-json",
+			"component": "microsoft-serialization-json",
 			"changelog-path": "CHANGELOG.md",
 			"release-type": "simple",
 			"extra-files": [
@@ -85,7 +85,7 @@
 		},
 		"packages/serialization/multipart": {
 			"package-name": "microsoft/kiota-serialization-multipart",
-			"component": "serialization-multipart",
+			"component": "microsoft-serialization-multipart",
 			"changelog-path": "CHANGELOG.md",
 			"release-type": "simple",
 			"extra-files": [
@@ -100,7 +100,7 @@
 		},
 		"packages/serialization/text": {
 			"package-name": "microsoft/kiota-serialization-text",
-			"component": "serialization-text",
+			"component": "microsoft-serialization-text",
 			"changelog-path": "CHANGELOG.md",
 			"release-type": "simple",
 			"extra-files": [
@@ -114,5 +114,20 @@
 			]
 		}
 	},
+	"plugins": [
+		{
+			"type": "linked-versions",
+			"groupName": "microsoft-kiota-php",
+			"components": [
+				"microsoft-abstractions",
+				"microsoft-authentication-phpleague",
+				"microsoft-http-guzzle",
+				"microsoft-serialization-form",
+				"microsoft-serialization-json",
+				"microsoft-serialization-multipart",
+				"microsoft-serialization-text"
+			]
+		}
+	],
 	"$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json"
 }
