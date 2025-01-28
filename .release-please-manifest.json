@@ -1,0 +1,9 @@
+{
+	"packages/abstractions": "1.4.0",
+	"packages/authentication/phpleague": "1.4.0",
+	"packages/http/guzzle": "1.4.0",
+	"packages/serialization/form": "1.4.0",
+	"packages/serialization/text": "1.4.0",
+	"packages/serialization/json": "1.4.0",
+	"packages/serialization/multipart": "1.4.0"
+}
