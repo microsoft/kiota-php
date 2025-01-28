@@ -20,11 +20,6 @@
 			"release-type": "simple",
 			"extra-files": [
 				"src/Constants.php",
-				{
-					"type": "json",
-					"path": "composer.json",
-					"jsonpath": "$.json.version"
-				},
 				"README.md"
 			]
 		},
@@ -38,7 +33,7 @@
 				{
 					"type": "json",
 					"path": "composer.json",
-					"jsonpath": "$.json.version"
+					"jsonpath": "$.require.microsoft/kiota-abstractions"
 				},
 				"README.md"
 			]
@@ -53,7 +48,7 @@
 				{
 					"type": "json",
 					"path": "composer.json",
-					"jsonpath": "$.json.version"
+					"jsonpath": "$.require.microsoft/kiota-abstractions"
 				},
 				"README.md"
 			]
@@ -68,7 +63,7 @@
 				{
 					"type": "json",
 					"path": "composer.json",
-					"jsonpath": "$.json.version"
+					"jsonpath": "$.require.microsoft/kiota-abstractions"
 				},
 				"README.md"
 			]
@@ -83,7 +78,7 @@
 				{
 					"type": "json",
 					"path": "composer.json",
-					"jsonpath": "$.json.version"
+					"jsonpath": "$.require.microsoft/kiota-abstractions"
 				},
 				"README.md"
 			]
@@ -98,7 +93,7 @@
 				{
 					"type": "json",
 					"path": "composer.json",
-					"jsonpath": "$.json.version"
+					"jsonpath": "$.require.microsoft/kiota-abstractions"
 				},
 				"README.md"
 			]
@@ -113,7 +108,7 @@
 				{
 					"type": "json",
 					"path": "composer.json",
-					"jsonpath": "$.json.version"
+					"jsonpath": "$.require.microsoft/kiota-abstractions"
 				},
 				"README.md"
 			]
