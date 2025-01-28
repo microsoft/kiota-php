@@ -1,6 +1,7 @@
 {
     "name": "microsoft/kiota-serialization-text",
     "description": "Implementation of Serialization Abstractions for text/plain content",
+	"version": "1.1.0",
     "type": "library",
     "license": "MIT",
     "authors": [
@@ -9,14 +10,23 @@
             "email": "graphtooling@service.microsoft.com"
         }
     ],
+	"repositories": [
+        {
+            "type": "path",
+            "url": "../../abstractions",
+            "options": {
+                    "symlink": false
+            }
+        }
+    ],
     "require": {
-		"php": "^7.4 | ^8.0",
-		"microsoft/kiota-abstractions": "^1.3.1",
+		"php": "^7.4 || ^8.0",
+		"microsoft/kiota-abstractions": "^1.4.0",
 		"guzzlehttp/psr7": "^1.6 || ^2"
 	},
 	"require-dev": {
-		"phpunit/phpunit": "^9.5",
-		"phpstan/phpstan": "^1.2"
+		"phpunit/phpunit": "^9.6.22",
+		"phpstan/phpstan": "^1.12.16"
 	},
 	"autoload": {
 		"psr-4": {
@@ -30,7 +40,8 @@
 	},
     "config": {
         "allow-plugins": {
-            "php-http/discovery": false
+            "php-http/discovery": false,
+			"tbachert/spi": false
         }
     }
 }

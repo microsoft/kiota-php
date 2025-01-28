@@ -1,17 +1,27 @@
 {
     "name": "microsoft/kiota-http-guzzle",
     "description": "Kiota HTTP Request Adapter implementation",
+	"version": "1.3.1",
     "type": "library",
+	"repositories": [
+		{
+			"type": "path",
+			"url": "../../abstractions",
+			"options": {
+				"symlink": false
+			}
+		}
+	],
 	"require": {
-		"php": "^7.4 | ^8.0",
+		"php": "^7.4 || ^8.0",
 		"guzzlehttp/guzzle": "^7.4.5",
-		"microsoft/kiota-abstractions": "^1.1.0",
+		"microsoft/kiota-abstractions": "^1.4.0",
 		"ext-zlib": "*",
 		"ext-json": "*"
 	},
     "require-dev": {
-        "phpunit/phpunit": "^9.5",
-        "phpstan/phpstan": "^1.2"
+        "phpunit/phpunit": "^9.6.22",
+        "phpstan/phpstan": "^1.12.16"
 	},
     "license": "MIT",
     "authors": [

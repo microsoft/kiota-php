@@ -1,6 +1,7 @@
 {
     "name": "microsoft/kiota-authentication-phpleague",
     "description": "Authentication provider for Kiota using the PHP League OAuth 2.0 client to authenticate against the Microsoft Identity platform",
+    "version": "1.3.1",
     "type": "library",
     "license": "MIT",
     "authors": [
@@ -9,18 +10,27 @@
             "email": "graphtooling@service.microsoft.com"
         }
     ],
+    "repositories": [
+        {
+            "type": "path",
+            "url": "../../abstractions",
+            "options": {
+                "symlink": false
+            }
+        }
+    ],
     "require": {
-        "php": "^7.4 | ^8.0",
+        "php": "^7.4 || ^8.0",
         "league/oauth2-client": "^2.6.1",
-        "microsoft/kiota-abstractions": "^1.0.2",
+        "microsoft/kiota-abstractions": "^1.4.0",
         "firebase/php-jwt": "^v6.0.0",
         "ramsey/uuid": "^4.2.3",
         "ext-openssl": "*",
         "ext-json": "*"
     },
 	"require-dev": {
-		"phpunit/phpunit": "^9.5.13",
-        "phpstan/phpstan": "^1.4.6"
+		"phpunit/phpunit": "^9.6.22",
+        "phpstan/phpstan": "^1.12.16"
     },
     "autoload": {
         "psr-4": {
