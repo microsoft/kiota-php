@@ -14,10 +14,12 @@ Read more about Kiota [here](https://github.com/microsoft/kiota/blob/main/README
 
 run `composer require microsoft/kiota-serialization-json` or add the following to your `composer.json` file:
 
-```Shell
+```
 {
     "require": {
+        // x-release-please-start-version
         "microsoft/kiota-serialization-json": "^1.3.0"
+        // x-release-end
     }
 }
 ```

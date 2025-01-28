@@ -9,10 +9,12 @@ types for [Kiota](https://github.com/microsoft/kiota) generated projects.
 
 run `composer require microsoft/kiota-serialization-text` or add the following to your `composer.json` file:
 
-```Shell
+```
 {
     "require": {
+        // x-release-please-start-version
         "microsoft/kiota-serialization-text": "^1.0.1"
+        // x-release-please-end
     }
 }
 ```
