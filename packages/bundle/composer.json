@@ -30,35 +30,35 @@
 		},
 		{
 			"type": "path",
-			"url": "../../http/guzzle",
+			"url": "../http/guzzle",
 			"options": {
 				"symlink": false
 			}
 		},
 		{
 			"type": "path",
-			"url": "../../serialization/json",
+			"url": "../serialization/json",
 			"options": {
 				"symlink": false
 			}
 		},
 		{
 			"type": "path",
-			"url": "../../serialization/form",
+			"url": "../serialization/form",
 			"options": {
 				"symlink": false
 			}
 		},
 		{
 			"type": "path",
-			"url": "../../serialization/multipart",
+			"url": "../serialization/multipart",
 			"options": {
 				"symlink": false
 			}
 		},
 		{
 			"type": "path",
-			"url": "../../serialization/text",
+			"url": "../serialization/text",
 			"options": {
 				"symlink": false
 			}
