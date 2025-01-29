@@ -38,6 +38,9 @@ class DefaultRequestAdapter extends GuzzleRequestAdapter
         $this->setupDefaults();
     }
 
+    /**
+     * Returns a builder for DefaultRequestAdapter
+     */
     public static function builder(): DefaultRequestAdapterBuilder
     {
         return new DefaultRequestAdapterBuilder();
