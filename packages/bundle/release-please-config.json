@@ -1,0 +1,57 @@
+{
+	"bootstrap-sha": "93d4a0947a6d946bbe2a80425f66891a17e69750",
+	"exclude-paths": [
+		".git",
+		".idea",
+		".github",
+		".vscode",
+		"tests",
+		"scripts"
+	],
+	"release-as": "1.5.0",
+	"include-v-in-tag": true,
+	"include-component-in-tag": false,
+	"bump-minor-pre-major": true,
+	"bump-patch-for-minor-pre-major": true,
+	"packages": {
+		".": {
+			"package-name": "microsoft/kiota-bundle",
+			"changelog-path": "CHANGELOG.md",
+			"release-type": "simple",
+			"extra-files": [
+				"README.md",
+				{
+					"type": "json",
+					"path": "composer.json",
+					"jsonpath": "$.require.microsoft/kiota-abstractions"
+				},
+				{
+					"type": "json",
+					"path": "composer.json",
+					"jsonpath": "$.require.microsoft/kiota-http-guzzle"
+				},
+				{
+					"type": "json",
+					"path": "composer.json",
+					"jsonpath": "$.require.microsoft/kiota-serialization-form"
+				},
+				{
+					"type": "json",
+					"path": "composer.json",
+					"jsonpath": "$.require.microsoft/kiota-serialization-json"
+				},
+				{
+					"type": "json",
+					"path": "composer.json",
+					"jsonpath": "$.require.microsoft/kiota-serialization-text"
+				},
+				{
+					"type": "json",
+					"path": "composer.json",
+					"jsonpath": "$.require.microsoft/kiota-serialization-multipart"
+				}
+			]
+		}
+	},
+	"$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json"
+}
