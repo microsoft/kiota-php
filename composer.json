@@ -8,6 +8,64 @@
             "email": "graphtooling@service.microsoft.com"
         }
     ],
+	"repositories": [
+		{
+			"type": "path",
+			"url": "packages/abstractions",
+			"options": {
+				"symlink": false
+			}
+		},
+		{
+			"type": "path",
+			"url": "packages/authentication/phpleague",
+			"options": {
+				"symlink": false
+			}
+		},
+		{
+			"type": "path",
+			"url": "packages/bundle",
+			"options": {
+				"symlink": false
+			}
+		},
+		{
+			"type": "path",
+			"url": "packages/http/guzzle",
+			"options": {
+				"symlink": false
+			}
+		},
+		{
+			"type": "path",
+			"url": "packages/serialization/form",
+			"options": {
+				"symlink": false
+			}
+		},
+		{
+			"type": "path",
+			"url": "packages/serialization/json",
+			"options": {
+				"symlink": false
+			}
+		},
+		{
+			"type": "path",
+			"url": "packages/serialization/multipart",
+			"options": {
+				"symlink": false
+			}
+		},
+		{
+			"type": "path",
+			"url": "packages/serialization/text",
+			"options": {
+				"symlink": false
+			}
+		}
+	],
     "require": {
         "doctrine/annotations": "^1.13 || ^2.0",
         "ext-json": "*",
@@ -30,92 +88,16 @@
         "roave/security-advisories": "dev-latest",
         "symplify/monorepo-builder": "^11.2.22"
     },
-    "repositories": [
-        {
-            "options": {
-                "symlink": false
-            },
-            "type": "path",
-            "url": "abstractions"
-        },
-        {
-            "options": {
-                "symlink": false
-            },
-            "type": "path",
-            "url": "http/guzzle"
-        },
-        {
-            "options": {
-                "symlink": false
-            },
-            "type": "path",
-            "url": "serialization/form"
-        },
-        {
-            "options": {
-                "symlink": false
-            },
-            "type": "path",
-            "url": "serialization/json"
-        },
-        {
-            "options": {
-                "symlink": false
-            },
-            "type": "path",
-            "url": "serialization/multipart"
-        },
-        {
-            "options": {
-                "symlink": false
-            },
-            "type": "path",
-            "url": "serialization/text"
-        },
-        {
-            "options": {
-                "symlink": false
-            },
-            "type": "path",
-            "url": "packages/abstractions"
-        },
-        {
-            "options": {
-                "symlink": false
-            },
-            "type": "path",
-            "url": "packages/http/guzzle"
-        },
-        {
-            "options": {
-                "symlink": false
-            },
-            "type": "path",
-            "url": "packages/serialization/form"
-        },
-        {
-            "options": {
-                "symlink": false
-            },
-            "type": "path",
-            "url": "packages/serialization/json"
-        },
-        {
-            "options": {
-                "symlink": false
-            },
-            "type": "path",
-            "url": "packages/serialization/multipart"
-        },
-        {
-            "options": {
-                "symlink": false
-            },
-            "type": "path",
-            "url": "packages/serialization/text"
-        }
-    ],
+    "replace": {
+        "microsoft/kiota-abstractions": "self.version",
+        "microsoft/kiota-authentication-phpleague": "self.version",
+        "microsoft/kiota-bundle": "self.version",
+        "microsoft/kiota-http-guzzle": "self.version",
+        "microsoft/kiota-serialization-form": "self.version",
+        "microsoft/kiota-serialization-json": "self.version",
+        "microsoft/kiota-serialization-multipart": "self.version",
+        "microsoft/kiota-serialization-text": "self.version"
+    },
     "autoload": {
         "psr-4": {
             "Microsoft\\Kiota\\Abstractions\\": "packages/abstractions/src/",
@@ -144,15 +126,5 @@
         "allow-plugins": {
             "php-http/discovery": false
         }
-    },
-    "replace": {
-        "microsoft/kiota-abstractions": "self.version",
-        "microsoft/kiota-authentication-phpleague": "self.version",
-        "microsoft/kiota-bundle": "self.version",
-        "microsoft/kiota-http-guzzle": "self.version",
-        "microsoft/kiota-serialization-form": "self.version",
-        "microsoft/kiota-serialization-json": "self.version",
-        "microsoft/kiota-serialization-multipart": "self.version",
-        "microsoft/kiota-serialization-text": "self.version"
     }
 }

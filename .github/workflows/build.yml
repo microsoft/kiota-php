@@ -31,16 +31,6 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        package-path: [
-          'abstractions',
-          'authentication/phpleague',
-          'http/guzzle',
-          'serialization/json',
-          'serialization/text',
-          'serialization/form',
-          'serialization/multipart',
-          'bundle'
-        ]
         php-versions: ['7.4', '8.0', '8.1', '8.2', '8.3']
     steps:
       - name: Checkout
@@ -51,65 +41,34 @@ jobs:
           php-version: ${{ matrix.php-versions }}
           coverage: none
       - name: Install dependencies
-        working-directory: packages/${{ matrix.package-path }}
         run: composer install
+      - name: Monorepo Builder merge dependencies
+        run: ./vendor/bin/monorepo-builder merge
       - name: Run static analysis
-        working-directory: packages/${{ matrix.package-path }}
         run: ./vendor/bin/phpstan
       - name: Run tests without coverage
-        working-directory: packages/${{ matrix.package-path }}
         run: ./vendor/bin/phpunit --no-coverage
-
-  upload-coverage-reports:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        package-path: [
-          'abstractions',
-          'authentication/phpleague',
-          'http/guzzle',
-          'serialization/json',
-          'serialization/text',
-          'serialization/form',
-          'serialization/multipart',
-          'bundle'
-        ]
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Setup PHP and Xdebug for Code Coverage report
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.3'
-          coverage: xdebug
-      - name: Install dependencies
-        working-directory: packages/${{ matrix.package-path }}
-        run: composer install
-      - name: Run tests with coverage
-        working-directory: packages/${{ matrix.package-path }}
-        run: ./vendor/bin/phpunit --coverage-clover=coverage.xml
-      - name: Fix code coverage paths
-        working-directory: packages/${{ matrix.package-path }}
-        run: |
-          sed -i 's@'$GITHUB_WORKSPACE'@/github/workspace/@g' coverage.xml
-          echo "ARTIFACT_NAME=$(echo ${{ matrix.package-path }} | sed 's/\//-/g')" >> $GITHUB_ENV
-      - name: Upload code coverage report
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage-reports-${{ env.ARTIFACT_NAME}}
-          path: packages/${{ matrix.package-path }}/coverage.xml
 
   code-coverage:
     runs-on: ubuntu-latest
-    needs: upload-coverage-reports
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           # Disabling shallow clones is recommended for improving the relevancy of reporting
           fetch-depth: 0
-      - name: Download code coverage reports
-        uses: actions/download-artifact@v4
+      - name: Setup PHP and Xdebug for Code Coverage report
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          coverage: xdebug
+      - name: Install dependencies
+        run: composer install
+      - name: Run tests with coverage
+        run: ./vendor/bin/phpunit --coverage-clover=coverage.xml
+      - name: Fix code coverage paths
+        run: |
+          sed -i 's@'$GITHUB_WORKSPACE'@/github/workspace/@g' coverage.xml
       - name: SonarCloud Scan
         if: ${{ !github.event.pull_request.head.repo.fork }}
         uses: SonarSource/sonarqube-scan-action@v4

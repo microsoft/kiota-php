@@ -1,0 +1,19 @@
+parameters:
+    level: 9
+    polluteScopeWithAlwaysIterableForeach: false
+    polluteScopeWithLoopInitialAssignments: false
+    paths:
+        - packages/abstractions/src
+        - packages/authentication/phpleague/src
+        - packages/http/guzzle/src
+        - packages/bundle/src
+        - packages/serialization/json/src
+        - packages/serialization/form/src
+        - packages/serialization/text/src
+        - packages/serialization/multipart/src
+    ignoreErrors:
+        - '/^Parameter #1 \$[A-Za-z_0-9]+ of function is_subclass_of expects object\|string, mixed given.$/'
+        - '/^Parameter #1 \$[A-Za-z_0-9]+ of function strval expects bool\|float\|int\|resource\|string\|null, mixed given.$/'
+        - '/^Parameter #1 \$[A-Za-z_0-9]+ of function intval expects array\|bool\|float\|int\|resource\|string\|null, mixed given.$/'
+        - '/^Parameter #1 \$[A-Za-z_0-9]+ of function (strval|intval|floatval) expects (array\||)bool\|float\|int\|resource\|string\|null, mixed given.$/'
+
