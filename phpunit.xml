@@ -26,7 +26,8 @@
             <directory>packages/serialization/multipart/tests</directory>
         </testsuite>
     </testsuites>
-    <coverage pathCoverage="true">
+    <coverage includeUncoveredFiles="true"
+              pathCoverage="true">
         <include>
             <directory suffix=".php">src</directory>
         </include>
