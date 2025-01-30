@@ -29,7 +29,7 @@
     <coverage includeUncoveredFiles="true"
               pathCoverage="true">
         <include>
-            <directory suffix=".php">src</directory>
+            <directory suffix=".php">packages</directory>
         </include>
         <exclude>
             <file>packages/abstractions/src/RequestOption.php</file>
