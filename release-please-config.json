@@ -20,7 +20,12 @@
 			"release-type": "simple",
 			"extra-files": [
 				"src/Constants.php",
-				"README.md"
+				"README.md",
+				{
+					"type": "json",
+					"path": "release-please-config.json",
+					"jsonpath": "$.release-as"
+				}
 			]
 		},
 		"packages/authentication/phpleague": {
@@ -30,12 +35,17 @@
 			"release-type": "simple",
 			"extra-files": [
 				"src/Constants.php",
+				"README.md",
 				{
 					"type": "json",
 					"path": "composer.json",
 					"jsonpath": "$.require.microsoft/kiota-abstractions"
 				},
-				"README.md"
+				{
+					"type": "json",
+					"path": "release-please-config.json",
+					"jsonpath": "$.release-as"
+				}
 			]
 		},
 		"packages/http/guzzle": {
@@ -45,12 +55,17 @@
 			"release-type": "simple",
 			"extra-files": [
 				"src/Constants.php",
+				"README.md",
 				{
 					"type": "json",
 					"path": "composer.json",
 					"jsonpath": "$.require.microsoft/kiota-abstractions"
 				},
-				"README.md"
+				{
+					"type": "json",
+					"path": "release-please-config.json",
+					"jsonpath": "$.release-as"
+				}
 			]
 		},
 		"packages/serialization/form": {
@@ -64,6 +79,11 @@
 					"type": "json",
 					"path": "composer.json",
 					"jsonpath": "$.require.microsoft/kiota-abstractions"
+				},
+				{
+					"type": "json",
+					"path": "release-please-config.json",
+					"jsonpath": "$.release-as"
 				},
 				"README.md"
 			]
@@ -80,6 +100,11 @@
 					"path": "composer.json",
 					"jsonpath": "$.require.microsoft/kiota-abstractions"
 				},
+				{
+					"type": "json",
+					"path": "release-please-config.json",
+					"jsonpath": "$.release-as"
+				},
 				"README.md"
 			]
 		},
@@ -95,6 +120,11 @@
 					"path": "composer.json",
 					"jsonpath": "$.require.microsoft/kiota-abstractions"
 				},
+				{
+					"type": "json",
+					"path": "release-please-config.json",
+					"jsonpath": "$.release-as"
+				},
 				"README.md"
 			]
 		},
@@ -109,6 +139,11 @@
 					"type": "json",
 					"path": "composer.json",
 					"jsonpath": "$.require.microsoft/kiota-abstractions"
+				},
+				{
+					"type": "json",
+					"path": "release-please-config.json",
+					"jsonpath": "$.release-as"
 				},
 				"README.md"
 			]
