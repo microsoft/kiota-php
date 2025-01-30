@@ -38,7 +38,8 @@ jobs:
           'serialization/json',
           'serialization/text',
           'serialization/form',
-          'serialization/multipart'
+          'serialization/multipart',
+          'bundle'
         ]
         php-versions: ['7.4', '8.0', '8.1', '8.2', '8.3']
     steps:
@@ -70,7 +71,8 @@ jobs:
           'serialization/json',
           'serialization/text',
           'serialization/form',
-          'serialization/multipart'
+          'serialization/multipart',
+          'bundle'
         ]
     steps:
       - name: Checkout
