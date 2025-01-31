@@ -1,7 +1,6 @@
 {
     "name": "microsoft/kiota-serialization-multipart",
     "description": "Multipart implementation of Kiota abstractions serialization.",
-    "version": "1.0.0",
     "authors": [
         {
             "name": "Microsoft Graph Client Tooling",
