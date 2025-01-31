@@ -1,6 +1,6 @@
 <?php
 
-namespace Microsoft\Kiota\Serialization\Tests;
+namespace Microsoft\Kiota\Serialization\Json\Tests;
 
 use DateInterval;
 use DateTime;
@@ -13,9 +13,9 @@ use Microsoft\Kiota\Abstractions\Types\Date;
 use Microsoft\Kiota\Abstractions\Types\Time;
 use Microsoft\Kiota\Serialization\Json\JsonParseNode;
 use Microsoft\Kiota\Serialization\Json\JsonParseNodeFactory;
-use Microsoft\Kiota\Serialization\Tests\Samples\Address;
-use Microsoft\Kiota\Serialization\Tests\Samples\MaritalStatus;
-use Microsoft\Kiota\Serialization\Tests\Samples\Person;
+use Microsoft\Kiota\Serialization\Json\Tests\Samples\Address;
+use Microsoft\Kiota\Serialization\Json\Tests\Samples\MaritalStatus;
+use Microsoft\Kiota\Serialization\Json\Tests\Samples\Person;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\StreamInterface;
 

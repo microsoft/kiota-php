@@ -20,15 +20,6 @@
             "Microsoft\\Kiota\\Serialization\\Multipart\\Tests\\": "tests"
         }
     },
-    "repositories": [
-		{
-			"type": "path",
-			"url": "../../abstractions",
-			"options": {
-							"symlink": false
-			}
-		}
-    ],
     "require": {
         "microsoft/kiota-abstractions": "^1.4.0",
         "guzzlehttp/psr7": "^1.6 || ^2",

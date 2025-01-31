@@ -8,11 +8,124 @@
             "email": "graphtooling@service.microsoft.com"
         }
     ],
-	"require": {
-		"php": "^7.4 || ^8.0"
-	},
+	"repositories": [
+		{
+			"type": "path",
+			"url": "packages/abstractions",
+			"options": {
+				"symlink": false
+			}
+		},
+		{
+			"type": "path",
+			"url": "packages/authentication/phpleague",
+			"options": {
+				"symlink": false
+			}
+		},
+		{
+			"type": "path",
+			"url": "packages/bundle",
+			"options": {
+				"symlink": false
+			}
+		},
+		{
+			"type": "path",
+			"url": "packages/http/guzzle",
+			"options": {
+				"symlink": false
+			}
+		},
+		{
+			"type": "path",
+			"url": "packages/serialization/form",
+			"options": {
+				"symlink": false
+			}
+		},
+		{
+			"type": "path",
+			"url": "packages/serialization/json",
+			"options": {
+				"symlink": false
+			}
+		},
+		{
+			"type": "path",
+			"url": "packages/serialization/multipart",
+			"options": {
+				"symlink": false
+			}
+		},
+		{
+			"type": "path",
+			"url": "packages/serialization/text",
+			"options": {
+				"symlink": false
+			}
+		}
+	],
+    "require": {
+        "doctrine/annotations": "^1.13 || ^2.0",
+        "ext-json": "*",
+        "ext-openssl": "*",
+        "ext-zlib": "*",
+        "firebase/php-jwt": "^v6.0.0",
+        "guzzlehttp/guzzle": "^7.4.5",
+        "guzzlehttp/psr7": "^1.6 || ^2",
+        "league/oauth2-client": "^2.6.1",
+        "open-telemetry/sdk": "^1.0.0",
+        "php": "^7.4 || ^8.0",
+        "php-http/promise": "~1.2.0",
+        "psr/http-message": "^1.1 || ^2.0",
+        "ramsey/uuid": "^4.2.3",
+        "stduritemplate/stduritemplate": "^0.0.53 || ^0.0.54 || ^0.0.55 || ^0.0.56 || ^0.0.57 || ^0.0.59 || ^1.0.0 || ^2.0.0"
+    },
     "require-dev": {
-		"symplify/monorepo-builder": "^11.2.22",
-		"phpunit/phpunit": "^9.6.22"
-	}
+        "phpstan/phpstan": "^1.12.16",
+        "phpunit/phpunit": "^9.6.22",
+        "roave/security-advisories": "dev-latest",
+        "symplify/monorepo-builder": "^11.2.22"
+    },
+    "replace": {
+        "microsoft/kiota-abstractions": "self.version",
+        "microsoft/kiota-authentication-phpleague": "self.version",
+        "microsoft/kiota-bundle": "self.version",
+        "microsoft/kiota-http-guzzle": "self.version",
+        "microsoft/kiota-serialization-form": "self.version",
+        "microsoft/kiota-serialization-json": "self.version",
+        "microsoft/kiota-serialization-multipart": "self.version",
+        "microsoft/kiota-serialization-text": "self.version"
+    },
+    "autoload": {
+        "psr-4": {
+            "Microsoft\\Kiota\\Abstractions\\": "packages/abstractions/src/",
+            "Microsoft\\Kiota\\Authentication\\": "packages/authentication/phpleague/src/",
+            "Microsoft\\Kiota\\Bundle\\": "packages/bundle/src/",
+            "Microsoft\\Kiota\\Http\\": "packages/http/guzzle/src/",
+            "Microsoft\\Kiota\\Serialization\\Form\\": "packages/serialization/form/src",
+            "Microsoft\\Kiota\\Serialization\\Json\\": "packages/serialization/json/src",
+            "Microsoft\\Kiota\\Serialization\\Multipart\\": "packages/serialization/multipart/src",
+            "Microsoft\\Kiota\\Serialization\\Text\\": "packages/serialization/text/src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Microsoft\\Kiota\\Abstractions\\Tests\\": "packages/abstractions/tests/",
+            "Microsoft\\Kiota\\Authentication\\Test\\": "packages/authentication/phpleague/tests/",
+            "Microsoft\\Kiota\\Bundle\\Test\\": "packages/bundle/tests/",
+            "Microsoft\\Kiota\\Http\\Test\\": "packages/http/guzzle/tests/",
+            "Microsoft\\Kiota\\Serialization\\Form\\Tests\\": "packages/serialization/form/tests",
+            "Microsoft\\Kiota\\Serialization\\Json\\Tests\\": "packages/serialization/json/tests",
+            "Microsoft\\Kiota\\Serialization\\Multipart\\Tests\\": "packages/serialization/multipart/tests",
+            "Microsoft\\Kiota\\Serialization\\Text\\Tests\\": "packages/serialization/text/tests/"
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "php-http/discovery": false,
+            "tbachert/spi": false
+        }
+    }
 }
