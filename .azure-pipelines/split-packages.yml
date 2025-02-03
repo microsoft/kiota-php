@@ -1,0 +1,27 @@
+trigger:
+  tags:
+    include:
+      - 'v*'
+
+pr: none
+
+resources:
+  repositories:
+    - repository: 1ESPipelineTemplates
+      type: git
+      name: 1ESPipelineTemplates/1ESPipelineTemplates
+      ref: refs/tags/release
+
+extends:
+  template: v1/1ES.Official.PipelineTemplate.yml@1ESPipelineTemplates
+  parameters:
+    pool:
+      name: 1es-ubuntu-latest-m
+      stages:
+      - stage: split packages
+        jobs:
+        - job: packages-split
+          steps:
+          - checkout: self
+            persistCredentials: false
+            fetchDepth: 0
