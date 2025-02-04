@@ -16,8 +16,9 @@ extends:
   template: v1/1ES.Official.PipelineTemplate.yml@1ESPipelineTemplates
   parameters:
     pool:
-      name: 1es-ubuntu-latest-m
-      os: linux
+      name: Azure-Pipelines-1ESPT-ExDShared
+      image: windows-latest
+      os: windows
     stages:
     - stage: split packages
       jobs:
@@ -54,7 +55,7 @@ extends:
         - checkout: self
           persistCredentials: false
           fetchDepth: 0
-        - task: Bash@3
+        - task: PowerShell@2
           displayName: 'Split package to branch'
           inputs:
             targetType: 'inline'
@@ -79,7 +80,7 @@ extends:
             script: |
               $token = ./scripts/Generate-GitHub-Token.ps1 -AppId $(microsoft-graph-devx-bot-appid) -PrivateKeyPath microsoft-graph-devx-bot-privatekey.pem' -Repository microsoft/$(target_repository)
               Write-Host "##vso[task.setvariable variable=gh_installation_token;isOutput=true;isSecret=true]$token"
-        - task: Bash@3
+        - task: PowerShell@2
           displayName: 'Create Pull Request in Target Repository'
           inputs:
             targetType: 'inline'
