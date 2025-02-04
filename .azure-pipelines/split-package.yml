@@ -17,13 +17,7 @@ extends:
   parameters:
     pool:
       name: 1es-ubuntu-latest-m
-      image: ubuntu-latest
       os: linux
-    sdl:
-      sourceAnalysisPool:
-        name: Azure-Pipelines-1ESPT-ExDShared
-        image: windows-latest
-        os: windows
     stages:
     - stage: split packages
       jobs:
