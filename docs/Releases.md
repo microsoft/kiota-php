@@ -31,7 +31,6 @@ Composer relies on the `version` tag in the sub-projects' `composer.json` to det
 To read more on Packagist's integration with GitHub and versioning:
 
 - https://packagist.org/about
-- https://packagist.org/about
 
 ## Versioning the mono-repo
 
