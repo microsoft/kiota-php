@@ -1,7 +1,6 @@
 {
     "name": "microsoft/kiota-bundle",
     "description": "Default implementations for Kiota client setup",
-	"version": "1.5.0",
     "type": "library",
 	"license": "MIT",
     "authors": [

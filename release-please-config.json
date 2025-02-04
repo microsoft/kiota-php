@@ -1,0 +1,168 @@
+{
+	"bootstrap-sha": "3bdc2db73ee55a6904f031402bb33896df1b6116",
+	"exclude-paths": [
+		".git",
+		".idea",
+		".github",
+		".vscode",
+		"tests",
+		"scripts"
+	],
+	"include-component-in-tag": true,
+	"include-v-in-tag": true,
+	"bump-minor-pre-major": true,
+	"bump-patch-for-minor-pre-major": true,
+	"packages": {
+		"packages/abstractions": {
+			"package-name": "microsoft/kiota-abstractions",
+			"component": "microsoft-abstractions",
+			"changelog-path": "CHANGELOG.md",
+			"release-type": "simple",
+			"extra-files": [
+				"src/Constants.php",
+				"README.md",
+				{
+					"type": "json",
+					"path": "release-please-config.json",
+					"jsonpath": "$.release-as"
+				}
+			]
+		},
+		"packages/authentication/phpleague": {
+			"package-name": "microsoft/kiota-authentication-phpleague",
+			"component": "microsoft-authentication-phpleague",
+			"changelog-path": "CHANGELOG.md",
+			"release-type": "simple",
+			"extra-files": [
+				"src/Constants.php",
+				"README.md",
+				{
+					"type": "json",
+					"path": "composer.json",
+					"jsonpath": "$.require.microsoft/kiota-abstractions"
+				},
+				{
+					"type": "json",
+					"path": "release-please-config.json",
+					"jsonpath": "$.release-as"
+				}
+			]
+		},
+		"packages/http/guzzle": {
+			"package-name": "microsoft/kiota-http-guzzle",
+			"component": "microsoft-http-guzzle",
+			"changelog-path": "CHANGELOG.md",
+			"release-type": "simple",
+			"extra-files": [
+				"src/Constants.php",
+				"README.md",
+				{
+					"type": "json",
+					"path": "composer.json",
+					"jsonpath": "$.require.microsoft/kiota-abstractions"
+				},
+				{
+					"type": "json",
+					"path": "release-please-config.json",
+					"jsonpath": "$.release-as"
+				}
+			]
+		},
+		"packages/serialization/form": {
+			"package-name": "microsoft/kiota-serialization-form",
+			"component": "microsoft-serialization-form",
+			"changelog-path": "CHANGELOG.md",
+			"release-type": "simple",
+			"extra-files": [
+				"src/Constants.php",
+				{
+					"type": "json",
+					"path": "composer.json",
+					"jsonpath": "$.require.microsoft/kiota-abstractions"
+				},
+				{
+					"type": "json",
+					"path": "release-please-config.json",
+					"jsonpath": "$.release-as"
+				},
+				"README.md"
+			]
+		},
+		"packages/serialization/json": {
+			"package-name": "microsoft/kiota-serialization-json",
+			"component": "microsoft-serialization-json",
+			"changelog-path": "CHANGELOG.md",
+			"release-type": "simple",
+			"extra-files": [
+				"src/Constants.php",
+				{
+					"type": "json",
+					"path": "composer.json",
+					"jsonpath": "$.require.microsoft/kiota-abstractions"
+				},
+				{
+					"type": "json",
+					"path": "release-please-config.json",
+					"jsonpath": "$.release-as"
+				},
+				"README.md"
+			]
+		},
+		"packages/serialization/multipart": {
+			"package-name": "microsoft/kiota-serialization-multipart",
+			"component": "microsoft-serialization-multipart",
+			"changelog-path": "CHANGELOG.md",
+			"release-type": "simple",
+			"extra-files": [
+				"src/Constants.php",
+				{
+					"type": "json",
+					"path": "composer.json",
+					"jsonpath": "$.require.microsoft/kiota-abstractions"
+				},
+				{
+					"type": "json",
+					"path": "release-please-config.json",
+					"jsonpath": "$.release-as"
+				},
+				"README.md"
+			]
+		},
+		"packages/serialization/text": {
+			"package-name": "microsoft/kiota-serialization-text",
+			"component": "microsoft-serialization-text",
+			"changelog-path": "CHANGELOG.md",
+			"release-type": "simple",
+			"extra-files": [
+				"src/Constants.php",
+				{
+					"type": "json",
+					"path": "composer.json",
+					"jsonpath": "$.require.microsoft/kiota-abstractions"
+				},
+				{
+					"type": "json",
+					"path": "release-please-config.json",
+					"jsonpath": "$.release-as"
+				},
+				"README.md"
+			]
+		}
+	},
+	"plugins": [
+		{
+			"type": "linked-versions",
+			"groupName": "microsoft-kiota-php",
+			"components": [
+				"microsoft-abstractions",
+				"microsoft-authentication-phpleague",
+				"microsoft-http-guzzle",
+				"microsoft-serialization-form",
+				"microsoft-serialization-json",
+				"microsoft-serialization-multipart",
+				"microsoft-serialization-text"
+			]
+		}
+	],
+	"$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json"
+}
