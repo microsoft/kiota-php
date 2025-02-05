@@ -84,8 +84,7 @@ extends:
           inputs:
             targetType: 'inline'
             script: |
-              $privateKey = ConvertTo-SecureString -String $(microsoft-graph-devx-bot-privatekey) -AsPlainText -Force
-              $privateKey | Out-File -FilePath microsoft-graph-devx-bot-privatekey.pem
+              "$(microsoft-graph-devx-bot-privatekey)" | Out-File -FilePath microsoft-graph-devx-bot-privatekey.pem
         - task: PowerShell@2
           displayName: 'Generate GitHub App Installation token'
           inputs:
