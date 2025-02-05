@@ -1,7 +1,7 @@
 trigger:
   tags:
     include:
-      - 'v*'
+      - 'microsoft-kiota-abstractions-v*'
 
 pr: none
 
@@ -91,13 +91,25 @@ extends:
           inputs:
             targetType: 'inline'
             script: |
-              $token = ./scripts/Generate-GitHub-Token.ps1 -AppId $(microsoft-graph-devx-bot-appid) -PrivateKeyPath microsoft-graph-devx-bot-privatekey.pem' -Repository microsoft/$(target_repository)
-              Write-Host "##vso[task.setvariable variable=gh_installation_token;isOutput=true;isSecret=true]$(token)"
+              $token = ./scripts/Generate-GitHub-Token.ps1 -AppClientId "$(microsoft-graph-devx-bot-appid)" -AppPrivateKeyPath microsoft-graph-devx-bot-privatekey.pem -Repository "microsoft/$(target_repository)"
+              Write-Host "##vso[task.setvariable variable=gh_installation_token;isOutput=true;isSecret=true]$token"
         - task: PowerShell@2
-          displayName: 'Create Pull Request in Target Repository'
+          displayName: 'Push changes to target repository'
           inputs:
             targetType: 'inline'
             script: |
               git checkout release/$(package_name)
               git remote add release/$(package_name) https://x-access-token:$(GenerateToken.gh_installation_token)@github.com/microsoft/$(target_repository).git
               git push -u $(package_name) release/$(package_name)
+        - task: PowerShell@2
+          displayName: 'Create PR in target repository'
+          inputs:
+            targetType: 'inline'
+            script: |
+              $title = "Mono-repo updates for release"
+              $body = "This PR contains updates from the [`kiota-php`](https://github.com/microsoft/kiota-php) monorepo. Merging these changes will trigger Release-Please on this repository."
+              gh auth login
+              gh pr create -t $title -b $body -B main -H release/$(package_name)
+          env:
+            GITHUB_TOKEN: $(GenerateToken.gh_installation_token)
+
