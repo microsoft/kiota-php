@@ -27,9 +27,9 @@ extends:
         image: windows-latest
         os: windows
     stages:
-    - stage: split packages
+    - stage: split_packages
       jobs:
-      - job: packages-split
+      - job: packages_split
         strategy:
           matrix:
             abstractions:
