@@ -156,8 +156,9 @@ function Get-InstallationId {
         return $userInstallationId
     }
 }
-$owner, $repo = $Repository -split '/'
-$AppToken = Generate-AppToken -ClientId $AppClientId -PrivateKeyPath $AppPrivateKeyPath
-$InstallationId = Get-InstallationId -AppToken $AppToken -Owner $owner -Repo $repo
-$InstallationToken = Generate-InstallationToken -AppToken $AppToken -InstallationId $InstallationId -Repository $repo
-Write-Output $InstallationToken
+# $owner, $repo = $Repository -split '/'
+# $AppToken = Generate-AppToken -ClientId $AppClientId -PrivateKeyPath $AppPrivateKeyPath
+# $InstallationId = Get-InstallationId -AppToken $AppToken -Owner $owner -Repo $repo
+# $InstallationToken = Generate-InstallationToken -AppToken $AppToken -InstallationId $InstallationId -Repository $repo
+# Write-Output $InstallationToken
+Write-Output "abcd"
