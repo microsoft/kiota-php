@@ -87,16 +87,17 @@ extends:
               "$(microsoft-graph-devx-bot-privatekey)" | Out-File -FilePath microsoft-graph-devx-bot-privatekey.pem
         - task: PowerShell@2
           displayName: 'Generate GitHub App Installation token'
+          name: GenerateToken
           inputs:
             targetType: 'inline'
             script: |
               $token = ./scripts/Generate-GitHub-Token.ps1 -AppId $(microsoft-graph-devx-bot-appid) -PrivateKeyPath microsoft-graph-devx-bot-privatekey.pem' -Repository microsoft/$(target_repository)
-              Write-Host "##vso[task.setvariable variable=gh_installation_token;isOutput=true;isSecret=true]$token"
+              Write-Host "##vso[task.setvariable variable=gh_installation_token;isOutput=true;isSecret=true]$(token)"
         - task: PowerShell@2
           displayName: 'Create Pull Request in Target Repository'
           inputs:
             targetType: 'inline'
             script: |
               git checkout release/$(package_name)
-              git remote add release/$(package_name) https://x-access-token:$(gh_installation_token)@github.com/microsoft/$(target_repository).git
+              git remote add release/$(package_name) https://x-access-token:$(GenerateToken.gh_installation_token)@github.com/microsoft/$(target_repository).git
               git push -u $(package_name) release/$(package_name)
