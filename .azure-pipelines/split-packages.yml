@@ -1,7 +1,7 @@
 trigger:
   tags:
     include:
-      - 'v*'
+      - 'microsoft-kiota-abstractions-v*'
 
 pr: none
 
@@ -16,12 +16,91 @@ extends:
   template: v1/1ES.Official.PipelineTemplate.yml@1ESPipelineTemplates
   parameters:
     pool:
-      name: 1es-ubuntu-latest-m
-      stages:
-      - stage: split packages
-        jobs:
-        - job: packages-split
-          steps:
-          - checkout: self
-            persistCredentials: false
-            fetchDepth: 0
+      name: Azure-Pipelines-1ESPT-ExDShared
+      image: windows-latest
+      os: windows
+    sdl:
+      git:
+        longpaths: true
+      sourceAnalysisPool:
+        name: Azure-Pipelines-1ESPT-ExDShared
+        image: windows-latest
+        os: windows
+    stages:
+    - stage: split_packages
+      jobs:
+      - job: packages_split
+        strategy:
+          matrix:
+            abstractions:
+              local_path: 'packages/abstractions'
+              target_repository: 'kiota-abstractions-php'
+              package_name: 'abstractions'
+            authentication:
+              local_path: 'packages/authentication/phpleague'
+              target_repository: 'kiota-authentication-phpleague-php'
+              package_name: 'authentication'
+            http:
+              local_path: 'packages/http/guzzle'
+              target_repository: 'kiota-http-guzzle-php'
+              package_name: 'http'
+            bundle:
+              local_path: 'packages/bundle'
+              target_repository: 'kiota-bundle-php'
+              package_name: 'bundle'
+            json:
+              local_path: 'packages/serialization/json'
+              target_repository: 'kiota-serialization-json-php'
+              package_name: 'serialization-json'
+            form:
+              local_path: 'packages/serialization/form'
+              target_repository: 'kiota-serialization-form-php'
+              package_name: 'serialization-form'
+            text:
+              local_path: 'packages/serialization/text'
+              target_repository: 'kiota-serialization-text-php'
+              package_name: 'serialization-text'
+            multipart:
+              local_path: 'packages/serialization/multipart'
+              target_repository: 'kiota-serialization-multipart-php'
+              package_name: 'serialization-multipart'
+        steps:
+        - checkout: self
+          persistCredentials: false
+          fetchDepth: 0
+        - task: PowerShell@2
+          displayName: 'Split package to branch'
+          inputs:
+            targetType: 'inline'
+            script: |
+              git subtree split -P $(local_path) -b release/$(package_name)
+        - task: AzureKeyVault@2
+          inputs:
+            azureSubscription: 'Federated AKV Managed Identity Connection'
+            KeyVaultName: 'akv-prod-eastus'
+            SecretsFilter: 'microsoft-graph-devx-bot-appid, microsoft-graph-devx-bot-privatekey'
+        - task: PowerShell@2
+          displayName: 'Write private key to file'
+          inputs:
+            targetType: 'inline'
+            script: |
+              "$(microsoft-graph-devx-bot-privatekey)" | Out-File -FilePath microsoft-graph-devx-bot-privatekey.pem
+        - pwsh: |
+            $token = ./scripts/Generate-GitHub-Token.ps1 -AppClientId "$(microsoft-graph-devx-bot-appid)" -AppPrivateKeyPath microsoft-graph-devx-bot-privatekey.pem -Repository microsoft/$(target_repository)
+            Write-Host "##vso[task.setvariable variable=gh_installation_token;isOutput=true;isSecret=true]$token"
+          displayName: 'Generate GitHub App Installation token'
+          name: GenerateToken
+        - pwsh: |
+            git checkout release/$(package_name)
+            git remote add $(package_name) https://x-access-token:$(GenerateToken.gh_installation_token)@github.com/microsoft/$(target_repository).git
+            git push -u $(package_name) release/$(package_name)
+          displayName: 'Push changes to target repository'
+        - pwsh: |
+            $title = "Mono-repo updates for release"
+            $body = "This PR contains updates from the [`kiota-php`](https://github.com/microsoft/kiota-php) monorepo. Merging these changes will trigger Release-Please on this repository."
+            gh auth login
+            gh pr create -t $title -b $body -B main -H release/$(package_name) --repo microsoft/$(target_repository)
+          displayName: 'Create PR in target repository'
+          env:
+            GITHUB_TOKEN: $(GenerateToken.gh_installation_token)
+

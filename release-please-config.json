@@ -15,7 +15,7 @@
 	"packages": {
 		"packages/abstractions": {
 			"package-name": "microsoft/kiota-abstractions",
-			"component": "microsoft-abstractions",
+			"component": "microsoft-kiota-abstractions",
 			"changelog-path": "CHANGELOG.md",
 			"release-type": "simple",
 			"extra-files": [
@@ -30,7 +30,7 @@
 		},
 		"packages/authentication/phpleague": {
 			"package-name": "microsoft/kiota-authentication-phpleague",
-			"component": "microsoft-authentication-phpleague",
+			"component": "microsoft-kiota-authentication-phpleague",
 			"changelog-path": "CHANGELOG.md",
 			"release-type": "simple",
 			"extra-files": [
@@ -50,7 +50,7 @@
 		},
 		"packages/http/guzzle": {
 			"package-name": "microsoft/kiota-http-guzzle",
-			"component": "microsoft-http-guzzle",
+			"component": "microsoft-kiota-http-guzzle",
 			"changelog-path": "CHANGELOG.md",
 			"release-type": "simple",
 			"extra-files": [
@@ -70,7 +70,7 @@
 		},
 		"packages/serialization/form": {
 			"package-name": "microsoft/kiota-serialization-form",
-			"component": "microsoft-serialization-form",
+			"component": "microsoft-kiota-serialization-form",
 			"changelog-path": "CHANGELOG.md",
 			"release-type": "simple",
 			"extra-files": [
@@ -90,7 +90,7 @@
 		},
 		"packages/serialization/json": {
 			"package-name": "microsoft/kiota-serialization-json",
-			"component": "microsoft-serialization-json",
+			"component": "microsoft-kiota-serialization-json",
 			"changelog-path": "CHANGELOG.md",
 			"release-type": "simple",
 			"extra-files": [
@@ -110,7 +110,7 @@
 		},
 		"packages/serialization/multipart": {
 			"package-name": "microsoft/kiota-serialization-multipart",
-			"component": "microsoft-serialization-multipart",
+			"component": "microsoft-kiota-serialization-multipart",
 			"changelog-path": "CHANGELOG.md",
 			"release-type": "simple",
 			"extra-files": [
@@ -130,7 +130,7 @@
 		},
 		"packages/serialization/text": {
 			"package-name": "microsoft/kiota-serialization-text",
-			"component": "microsoft-serialization-text",
+			"component": "microsoft-kiota-serialization-text",
 			"changelog-path": "CHANGELOG.md",
 			"release-type": "simple",
 			"extra-files": [
