@@ -2,7 +2,7 @@
     "name": "microsoft/kiota-bundle",
     "description": "Default implementations for Kiota client setup",
     "type": "library",
-	"license": "MIT",
+    "license": "MIT",
     "authors": [
         {
             "name": "Microsoft Graph Client Tooling",
@@ -14,24 +14,24 @@
             "Microsoft\\Kiota\\Bundle\\": "src/"
         }
     },
-	"autoload-dev": {
-		"psr-4": {
-			"Microsoft\\Kiota\\Bundle\\Test\\": "tests/"
-		}
-	},
+    "autoload-dev": {
+        "psr-4": {
+            "Microsoft\\Kiota\\Bundle\\Test\\": "tests/"
+        }
+    },
     "require": {
-		"php": "^7.4 || ^8.0",
-		"microsoft/kiota-abstractions": "^1.4.0",
-		"microsoft/kiota-http-guzzle": "^1.3.1",
-		"microsoft/kiota-serialization-json": "^1.3.1",
-		"microsoft/kiota-serialization-form": "^1.1.1",
-		"microsoft/kiota-serialization-multipart": "^1.0.0",
-		"microsoft/kiota-serialization-text": "^1.1.0"
-	},
-	"require-dev": {
+        "php": "^7.4 || ^8.0",
+        "microsoft/kiota-abstractions": "^1.5.0",
+        "microsoft/kiota-http-guzzle": "^1.5.0",
+        "microsoft/kiota-serialization-json": "^1.5.0",
+        "microsoft/kiota-serialization-form": "^1.5.0",
+        "microsoft/kiota-serialization-multipart": "^1.5.0",
+        "microsoft/kiota-serialization-text": "^1.5.0"
+    },
+    "require-dev": {
         "phpunit/phpunit": "^9.6.22",
-		"phpstan/phpstan": "^1.12.16"
-	},
+        "phpstan/phpstan": "^1.12.16"
+    },
     "config": {
         "allow-plugins": {
             "php-http/discovery": false
