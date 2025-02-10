@@ -73,6 +73,7 @@
 			"component": "microsoft-kiota-bundle",
 			"changelog-path": "CHANGELOG.md",
 			"release-type": "simple",
+			"release-as": "1.5.0",
 			"extra-files": [
 				"README.md",
 				{
