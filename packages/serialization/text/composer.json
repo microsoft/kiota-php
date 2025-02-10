@@ -10,28 +10,28 @@
         }
     ],
     "require": {
-		"php": "^7.4 || ^8.0",
-		"microsoft/kiota-abstractions": "^1.4.0",
-		"guzzlehttp/psr7": "^1.6 || ^2"
-	},
-	"require-dev": {
-		"phpunit/phpunit": "^9.6.22",
-		"phpstan/phpstan": "^1.12.16"
-	},
-	"autoload": {
-		"psr-4": {
-			"Microsoft\\Kiota\\Serialization\\Text\\": "src/"
-		}
-	},
-	"autoload-dev": {
-		"psr-4": {
-			"Microsoft\\Kiota\\Serialization\\Text\\Tests\\": "tests/"
-		}
-	},
+        "php": "^7.4 || ^8.0",
+        "microsoft/kiota-abstractions": "^1.5.0",
+        "guzzlehttp/psr7": "^1.6 || ^2"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.6.22",
+        "phpstan/phpstan": "^1.12.16"
+    },
+    "autoload": {
+        "psr-4": {
+            "Microsoft\\Kiota\\Serialization\\Text\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Microsoft\\Kiota\\Serialization\\Text\\Tests\\": "tests/"
+        }
+    },
     "config": {
         "allow-plugins": {
             "php-http/discovery": false,
-			"tbachert/spi": false
+            "tbachert/spi": false
         }
     }
 }
