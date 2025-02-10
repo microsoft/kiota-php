@@ -160,6 +160,15 @@ class JsonParseNodeTest extends TestCase
         $this->assertEquals('Silas Kenneth was here', $expected);
     }
 
+    /**
+     */
+    public function testGetStringValueWithSlashAndWhitespace(): void
+    {
+        $this->parseNode = new JsonParseNode('\ This is a test with a tab at then and slash at the beginning \t.');
+        $expected = $this->parseNode->getStringValue();
+        $this->assertEquals('\ This is a test with a tab at then and slash at the beginning \t.', $expected);
+    }
+
     public function testGetChildNode(): void {
         $this->stream->rewind();
         $this->parseNode = (new JsonParseNodeFactory())->getRootParseNode('application/json', $this->stream);
