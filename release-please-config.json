@@ -198,13 +198,13 @@
 			"type": "linked-versions",
 			"groupName": "microsoft-kiota-php",
 			"components": [
-				"microsoft-abstractions",
-				"microsoft-authentication-phpleague",
-				"microsoft-http-guzzle",
-				"microsoft-serialization-form",
-				"microsoft-serialization-json",
-				"microsoft-serialization-multipart",
-				"microsoft-serialization-text"
+				"microsoft-kiota-abstractions",
+				"microsoft-kiota-authentication-phpleague",
+				"microsoft-kiota-http-guzzle",
+				"microsoft-kiota-serialization-form",
+				"microsoft-kiota-serialization-json",
+				"microsoft-kiota-serialization-multipart",
+				"microsoft-kiota-serialization-text"
 			]
 		}
 	],
