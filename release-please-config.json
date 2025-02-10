@@ -68,6 +68,50 @@
 				}
 			]
 		},
+		"packages/bundle": {
+			"package-name": "microsoft/kiota-bundle",
+			"component": "microsoft-kiota-bundle",
+			"changelog-path": "CHANGELOG.md",
+			"release-type": "simple",
+			"extra-files": [
+				"README.md",
+				{
+					"type": "json",
+					"path": "composer.json",
+					"jsonpath": "$.require.microsoft/kiota-abstractions"
+				},
+				{
+					"type": "json",
+					"path": "composer.json",
+					"jsonpath": "$.require.microsoft/kiota-http-guzzle"
+				},
+				{
+					"type": "json",
+					"path": "composer.json",
+					"jsonpath": "$.require.microsoft/kiota-serialization-form"
+				},
+				{
+					"type": "json",
+					"path": "composer.json",
+					"jsonpath": "$.require.microsoft/kiota-serialization-json"
+				},
+				{
+					"type": "json",
+					"path": "composer.json",
+					"jsonpath": "$.require.microsoft/kiota-serialization-text"
+				},
+				{
+					"type": "json",
+					"path": "composer.json",
+					"jsonpath": "$.require.microsoft/kiota-serialization-multipart"
+				},
+				{
+					"type": "json",
+					"path": "release-please-config.json",
+					"jsonpath": "$.release-as"
+				}
+			]
+		},
 		"packages/serialization/form": {
 			"package-name": "microsoft/kiota-serialization-form",
 			"component": "microsoft-kiota-serialization-form",
