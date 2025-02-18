@@ -5,7 +5,7 @@ Kiota PHP is a mono-repo containing source code for the following packages:
 - ['microsoft/kiota-abstractions'](https://packagist.org/packages/microsoft/kiota-abstractions)
 - ['microsoft/kiota-http-guzzle'](https://packagist.org/packages/microsoft/kiota-http-guzzle)
 - ['microsoft/kiota-authentication-phpleague'](https://packagist.org/packages/microsoft/kiota-authentication-phpleague)
-- ['microsoft/kiota-bundle']()
+- ['microsoft/kiota-bundle'](https://packagist.org/packages/microsoft/kiota-bundle)
 - ['microsoft/kiota-serialization-multipart'](https://packagist.org/packages/microsoft/kiota-serialization-multipart)
 - ['microsoft/kiota-serialization-text'](https://packagist.org/packages/microsoft/kiota-serialization-text)
 - ['microsoft/kiota-serialization-json'](https://packagist.org/packages/microsoft/kiota-serialization-json)
