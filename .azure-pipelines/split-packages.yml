@@ -97,7 +97,7 @@ extends:
           displayName: 'Push changes to target repository'
         - pwsh: |
             $title = "Mono-repo updates for release"
-            $body = "This PR contains updates from the [`kiota-php`](https://github.com/microsoft/kiota-php) monorepo. Merging these changes will trigger Release-Please on this repository."
+            $body = "This PR contains updates from the [`kiota-php`](https://github.com/microsoft/kiota-php) monorepo. Merging these changes will trigger tagging and a GitHub release on this repository."
             gh auth login
             $prUrl = gh pr create -t $title -b $body -B main -H release/$(package_name) --repo microsoft/$(target_repository)
             gh pr merge $prUrl --merge --auto -R microsoft/$(target_repository)

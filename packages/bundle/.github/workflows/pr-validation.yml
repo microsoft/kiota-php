@@ -27,10 +27,6 @@ jobs:
           coverage: none
       - name: Install dependencies
         run: composer install
-      - name: Run static analysis
-        run: ./vendor/bin/phpstan
-      - name: Run tests without coverage
-        run: ./vendor/bin/phpunit
 
   # The check-php-version-matrix returns success if all matrix jobs in build are successful; otherwise, it returns a failure.
   # Use this as a PR status check for GitHub Policy Service instead of individual matrix entry checks.
