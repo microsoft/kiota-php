@@ -576,61 +576,7 @@ class GuzzleRequestAdapter implements RequestAdapter
         return true;
     }
 
-    /**
-     * Gets the appropriate error from the response
-     *
-     * @param ResponseInterface $response The HTTP response
-     * @param array<string, string> $errorMap Mapping of status codes to error types
-     * @param string $responseStatusCodeStr Status code as string
-     * @param int $responseStatusCode Status code as integer
-     * @param SpanInterface $attributeSpan Attribute tracing span
-     * @param SpanInterface $throwFailedRespSpan Failed response tracing span
-     * @return object|null The parsed error object or null
-     */
-    private function getErrorFromResponse(
-        ResponseInterface $response,
-        array $errorMap,
-        string $responseStatusCodeStr,
-        int $responseStatusCode,
-        SpanInterface $attributeSpan,
-        SpanInterface $throwFailedRespSpan
-    ): ?object {
-        // Try exact status code match
-        $errorClass = $errorMap[$responseStatusCodeStr] ?? null;
-        
-        if (!$errorClass) {
-            // Try range match (4XX, 5XX)
-            $statusCodeRange = floor($responseStatusCode / 100) . 'XX';
-            $errorClass = $errorMap[$statusCodeRange] ?? null;
-            
-            // Fallback to generic error (XXX)
-            if (!$errorClass) {
-                $errorClass = $errorMap['XXX'] ?? null;
-            }
-        }
-        
-        if ($errorClass) {
-            try {
-                $responseBody = (string)$response->getBody();
-                if (empty($responseBody)) {
-                    return null;
-                }
-                
-                // Assuming we have a factory method to create the error object
-                return $errorClass::createFromDiscriminatorValue(
-                    json_decode($responseBody, true)
-                );
-            } catch (Exception $e) {
-                $attributeSpan->setStatus(StatusCode::STATUS_ERROR);
-                $throwFailedRespSpan->setStatus(StatusCode::STATUS_ERROR);
-                // Log the error if needed
-                return null;
-            }
-        }
-        
-        return null;
-    }
-
+    
     /**
      * Authenticates and executes the request
      *
