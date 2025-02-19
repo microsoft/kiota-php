@@ -580,7 +580,7 @@ class GuzzleRequestAdapter implements RequestAdapter
      * Gets the appropriate error from the response
      *
      * @param ResponseInterface $response The HTTP response
-     * @param array<string, string> $errorMap Mapping of status codes to error types
+     * @param array<string, array<int, string>> $errorMap Mapping of status codes to error types
      * @param string $responseStatusCodeStr Status code as string
      * @param int $responseStatusCode Status code as integer
      * @param SpanInterface $attributeSpan Attribute tracing span
