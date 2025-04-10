@@ -14,7 +14,7 @@ use DateTime;
 use Exception;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Psr7\Request;
-use Http\Promise\Promise;
+use Microsoft\Kiota\Http\Promise;
 use InvalidArgumentException;
 use Microsoft\Kiota\Abstractions\ApiClientBuilder;
 use Microsoft\Kiota\Abstractions\ApiException;

@@ -1,7 +1,7 @@
 <?php
 namespace Microsoft\Kiota\Abstractions;
 
-use Http\Promise\Promise;
+use Microsoft\Kiota\Http\Promise;
 use Psr\Http\Message\ResponseInterface;
 use Microsoft\Kiota\Abstractions\Serialization\Parsable;
 

@@ -2,8 +2,8 @@
 
 namespace Microsoft\Kiota\Abstractions\Authentication;
 
-use Http\Promise\FulfilledPromise;
-use Http\Promise\Promise;
+use Microsoft\Kiota\Http\FulfilledPromise;
+use Microsoft\Kiota\Http\Promise;
 use Microsoft\Kiota\Abstractions\RequestInformation;
 
 class AnonymousAuthenticationProvider implements AuthenticationProvider {

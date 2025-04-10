@@ -2,9 +2,9 @@
 
 namespace Microsoft\Kiota\Abstractions;
 
-use Http\Promise\FulfilledPromise;
+use Microsoft\Kiota\Http\FulfilledPromise;
 use Psr\Http\Message\ResponseInterface;
-use Http\Promise\Promise;
+use Microsoft\Kiota\Http\Promise;
 
 /**
  * Default response handler that returns the PSR-7 Response

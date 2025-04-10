@@ -9,7 +9,7 @@
 namespace Microsoft\Kiota\Authentication\Oauth;
 
 use League\OAuth2\Client\Token\AccessToken;
-use Http\Promise\Promise;
+use Microsoft\Kiota\Http\Promise;
 
 /**
  * Interface TokenRequestContext
