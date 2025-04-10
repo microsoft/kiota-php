@@ -10,9 +10,9 @@ namespace Microsoft\Kiota\Authentication;
 
 
 use Exception;
-use Microsoft\Kiota\Http\FulfilledPromise;
-use Microsoft\Kiota\Http\Promise;
-use Microsoft\Kiota\Http\RejectedPromise;
+use Microsoft\Kiota\Abstraction\Promise\FulfilledPromise;
+use Microsoft\Kiota\Abstraction\Promise\Promise;
+use Microsoft\Kiota\Abstraction\Promise\RejectedPromise;
 use InvalidArgumentException;
 use League\OAuth2\Client\Provider\AbstractProvider;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;

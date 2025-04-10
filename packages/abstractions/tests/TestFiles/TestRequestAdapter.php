@@ -2,8 +2,8 @@
 
 namespace Microsoft\Kiota\Abstractions\Tests\TestFiles;
 
-use Microsoft\Kiota\Http\FulfilledPromise;
-use Microsoft\Kiota\Http\Promise;
+use Microsoft\Kiota\Abstraction\Promise\FulfilledPromise;
+use Microsoft\Kiota\Abstraction\Promise\Promise;
 use Microsoft\Kiota\Abstractions\RequestAdapter;
 use Microsoft\Kiota\Abstractions\RequestInformation;
 use Microsoft\Kiota\Abstractions\Serialization\ParseNodeFactory;

@@ -8,8 +8,7 @@
 
 namespace Microsoft\Kiota\Abstractions\Authentication;
 
-use Microsoft\Kiota\Http\Promise;
-use Microsoft\Kiota\Http\RejectedPromise;
+use Microsoft\Kiota\Abstraction\Promise\Promise;
 
 /**
  * Interface AccessTokenProvider

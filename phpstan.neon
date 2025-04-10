@@ -6,7 +6,6 @@ parameters:
         - packages/abstractions/src
         - packages/authentication/phpleague/src
         - packages/http/guzzle/src
-        - packages/http/promise/src
         - packages/bundle/src
         - packages/serialization/json/src
         - packages/serialization/form/src

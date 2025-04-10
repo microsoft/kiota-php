@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Microsoft\Kiota\Http;
+namespace Microsoft\Kiota\Abstraction\Promise;
 
 /**
  * Promise represents a value that may not be available yet, but will be resolved at some point in future.

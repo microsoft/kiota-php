@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Microsoft\Kiota\Http;
+namespace Microsoft\Kiota\Abstraction\Promise;
 
 /**
  * A promise already fulfilled.
@@ -12,7 +12,7 @@ namespace Microsoft\Kiota\Http;
  *
  * @implements Promise<T>
  */
-final class FulfilledPromise implements Promise
+class FulfilledPromise implements Promise
 {
 	/**
 	 * @var T

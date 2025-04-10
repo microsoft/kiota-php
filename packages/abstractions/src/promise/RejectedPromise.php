@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Microsoft\Kiota\Http;
+namespace Microsoft\Kiota\Abstraction\Promise;
 
 /**
  * A rejected promise.
@@ -12,7 +12,7 @@ namespace Microsoft\Kiota\Http;
  *
  * @implements Promise<T>
  */
-final class RejectedPromise implements Promise
+class RejectedPromise implements Promise
 {
 	/**
 	 * @var \Exception
