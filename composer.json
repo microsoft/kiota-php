@@ -86,7 +86,7 @@
         "phpstan/phpstan": "^1.12.16",
         "phpunit/phpunit": "^9.6.22",
         "roave/security-advisories": "dev-latest",
-        "symplify/monorepo-builder": "^11.2.22"
+        "symplify/monorepo-builder": "11.2.22"
     },
     "replace": {
         "microsoft/kiota-abstractions": "self.version",
