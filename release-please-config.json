@@ -159,6 +159,7 @@
 			"groupName": "microsoft-kiota-php",
 			"components": [
 				"microsoft-kiota-abstractions",
+				"microsoft-kiota-bundle",
 				"microsoft-kiota-authentication-phpleague",
 				"microsoft-kiota-http-guzzle",
 				"microsoft-kiota-serialization-form",
