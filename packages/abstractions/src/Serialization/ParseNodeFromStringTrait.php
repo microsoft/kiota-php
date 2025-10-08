@@ -14,13 +14,8 @@ trait ParseNodeFromStringTrait
     /**
      * @throws Exception
      */
-    private function parseDateIntervalFromString(?string $value): DateInterval
+    private function parseDateIntervalFromString(string $value): DateInterval
     {
-        // Provide a default zero interval if null or empty string
-        if ($value === null || $value === '') {
-            $value = 'P0D';
-        }
-
         $negativeValPosition = strpos($value, '-');
         $invert = 0;
         $str = $value;
@@ -33,6 +28,10 @@ trait ParseNodeFromStringTrait
 
         // Strip fractional seconds, e.g., PT33.48S => PT33S
         $str = preg_replace('/(\d+)\.\d+S$/', '$1S', $str);
+        
+        if (is_null($str) || is_array($str)) {
+            throw new Exception("Invalid DateInterval string: '$value'");
+        }
 
         $dateInterval = new DateInterval($str);
         $dateInterval->invert = $invert;
