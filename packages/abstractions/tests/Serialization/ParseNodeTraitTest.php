@@ -63,6 +63,28 @@ class ParseNodeTraitTest extends TestCase
         $this->assertEquals(33, $di->s, 'Seconds fractional part should be stripped to 33 seconds');
     }
 
+    public function testEmptyStringReturnsZeroInterval(): void
+    {
+        $parseNode = new class
+        {
+            use ParseNodeFromStringTrait {
+                parseDateIntervalFromString as public;
+            }
+        };
+
+        $di = $parseNode->parseDateIntervalFromString('');
+
+        $this->assertInstanceOf(DateInterval::class, $di);
+        $this->assertEquals(0, $di->y, 'Years should be 0');
+        $this->assertEquals(0, $di->m, 'Months should be 0');
+        $this->assertEquals(0, $di->d, 'Days should be 0');
+        $this->assertEquals(0, $di->h, 'Hours should be 0');
+        $this->assertEquals(0, $di->i, 'Minutes should be 0');
+        $this->assertEquals(0, $di->s, 'Seconds should be 0');
+        $this->assertEquals(0, $di->invert, 'Invert flag should be 0');
+    }
+
+
     public function testNegativeIntervalKeepsInvertFlag(): void
     {
         $parseNode = new class
