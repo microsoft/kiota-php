@@ -113,7 +113,24 @@ class GuzzleRequestAdapterTest extends TestCase
 
     public function testSendAsync(): void
     {
-        $requestAdapter = $this->mockRequestAdapter([new Response(200, ['Content-Type' => $this->contentType])]);
+        $requestAdapter = $this->mockRequestAdapter([new Response(200, ['Content-Type' => $this->contentType], '{"id": 1}')]);
+
+        $parseNode = $this->createStub(ParseNode::class);
+        $parseNode->method('getObjectValue')
+            ->willReturn(new TestUser(1));
+
+        $parseNodeFactory = $this->createStub(ParseNodeFactory::class);
+        $parseNodeFactory->method('getRootParseNode')
+            ->willReturn($parseNode);
+
+        $requestAdapter = new GuzzleRequestAdapter(
+            $this->authenticationProvider,
+            $parseNodeFactory,
+            $this->createMock(SerializationWriterFactory::class),
+            new Client(['handler' => new MockHandler([new Response(200, ['Content-Type' => $this->contentType], '{"id": 1}')])])
+        );
+        $requestAdapter->setBaseUrl($this->baseUrl);
+
         $promise = $requestAdapter->sendAsync($this->requestInformation, array(TestUser::class, 'createFromDiscriminatorValue'));
         $this->assertInstanceOf(TestUser::class, $promise->wait());
     }
