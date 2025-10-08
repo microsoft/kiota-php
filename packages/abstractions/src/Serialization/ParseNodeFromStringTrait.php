@@ -29,7 +29,7 @@ trait ParseNodeFromStringTrait
         // Strip fractional seconds, e.g., PT33.48S => PT33S
         $str = preg_replace('/(\d+)\.\d+S$/', '$1S', $str);
         
-        if (is_null($str) || is_array($str)) {
+        if (is_null($str)) {
             throw new Exception("Invalid DateInterval string: '$value'");
         }
 
