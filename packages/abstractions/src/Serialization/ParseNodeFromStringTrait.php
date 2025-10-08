@@ -26,6 +26,9 @@ trait ParseNodeFromStringTrait
         }
         // Strip fractional seconds, such as PT33.48S
         $str = preg_replace('/(\d+)\.\d+S$/', '$1S', $str);
+        if(strlen($str) === 0) {
+            throw new Exception("Invalid DateInterval string: '$value'");
+        }
         $dateInterval = new DateInterval($str);
         $dateInterval->invert = $invert;
         return $dateInterval;
