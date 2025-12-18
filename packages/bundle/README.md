@@ -15,7 +15,7 @@ run `composer require microsoft/kiota-bundle` or add the following to your `comp
 {
     "require": {
         // x-release-please-start-version
-        "microsoft/kiota-bundle": "^1.5.1"
+        "microsoft/kiota-bundle": "^1.5.2"
         // x-release-please-end
     }
 }
