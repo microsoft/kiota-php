@@ -71,7 +71,7 @@
         "ext-json": "*",
         "ext-openssl": "*",
         "ext-zlib": "*",
-        "firebase/php-jwt": "^v6.0.0",
+		"firebase/php-jwt": "^6 || ^7",
         "guzzlehttp/guzzle": "^7.4.5",
         "guzzlehttp/psr7": "^1.6 || ^2",
         "league/oauth2-client": "^2.6.1",
