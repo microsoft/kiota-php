@@ -59,6 +59,7 @@
 			"changelog-path": "CHANGELOG.md",
 			"release-type": "simple",
 			"extra-files": [
+				"src/Constants.php",
 				"README.md",
 				{
 					"type": "json",
