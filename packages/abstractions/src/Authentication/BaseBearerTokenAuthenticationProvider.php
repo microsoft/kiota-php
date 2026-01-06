@@ -2,8 +2,8 @@
 
 namespace Microsoft\Kiota\Abstractions\Authentication;
 
-use Http\Promise\FulfilledPromise;
-use Http\Promise\Promise;
+use Microsoft\Kiota\Abstraction\Promise\FulfilledPromise;
+use Microsoft\Kiota\Abstraction\Promise\Promise;
 use Microsoft\Kiota\Abstractions\RequestInformation;
 
 /**

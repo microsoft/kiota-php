@@ -1,7 +1,7 @@
 <?php
 namespace Microsoft\Kiota\Abstractions;
 
-use Http\Promise\Promise;
+use Microsoft\Kiota\Abstraction\Promise\Promise;
 use Microsoft\Kiota\Abstractions\Serialization\ParseNodeFactory;
 use Microsoft\Kiota\Abstractions\Serialization\SerializationWriterFactory;
 use Microsoft\Kiota\Abstractions\Store\BackingStoreFactory;

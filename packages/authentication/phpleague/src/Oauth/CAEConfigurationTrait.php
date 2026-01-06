@@ -8,7 +8,7 @@
 
 namespace Microsoft\Kiota\Authentication\Oauth;
 
-use Http\Promise\Promise;
+use Microsoft\Kiota\Abstraction\Promise\Promise;
 
 trait CAEConfigurationTrait
 {

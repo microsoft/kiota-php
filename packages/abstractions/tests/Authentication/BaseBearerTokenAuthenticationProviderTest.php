@@ -2,7 +2,7 @@
 
 namespace Microsoft\Kiota\Abstractions\Tests\Authentication;
 
-use Http\Promise\FulfilledPromise;
+use Microsoft\Kiota\Abstraction\Promise\FulfilledPromise;
 use Microsoft\Kiota\Abstractions\Authentication\AccessTokenProvider;
 use Microsoft\Kiota\Abstractions\Authentication\BaseBearerTokenAuthenticationProvider;
 use Microsoft\Kiota\Abstractions\RequestInformation;

@@ -7,7 +7,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
-use Http\Promise\FulfilledPromise;
+use Microsoft\Kiota\Http\FulfilledPromise;
 use InvalidArgumentException;
 use League\OAuth2\Client\Token\AccessToken;
 use Microsoft\Kiota\Authentication\Cache\InMemoryAccessTokenCache;
