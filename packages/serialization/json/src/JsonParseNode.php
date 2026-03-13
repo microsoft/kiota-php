@@ -53,32 +53,48 @@ class JsonParseNode implements ParseNode
      * @inheritDoc
      */
     public function getStringValue(): ?string {
-        return is_string($this->jsonNode) ? $this->jsonNode : null;
+        return self::getStringValueFromRaw($this->jsonNode);
     }
 
     /**
      * @inheritDoc
      */
     public function getBooleanValue(): ?bool {
-        return is_bool($this->jsonNode) ? $this->jsonNode : null;
+        return self::getBooleanValueFromRaw($this->jsonNode);
     }
 
     /**
      * @inheritDoc
      */
     public function getIntegerValue(): ?int {
-        return is_int($this->jsonNode) ? $this->jsonNode : null;
+        return self::getIntegerValueFromRaw($this->jsonNode);
     }
 
     /**
      * @inheritDoc
      */
     public function getFloatValue(): ?float {
-        if (is_float($this->jsonNode)) {
-            return $this->jsonNode;
+        return self::getFloatValueFromRaw($this->jsonNode);
+    }
+
+    private static function getStringValueFromRaw(mixed $rawValue): ?string {
+        return is_string($rawValue) ? $rawValue : null;
+    }
+
+    private static function getBooleanValueFromRaw(mixed $rawValue): ?bool {
+        return is_bool($rawValue) ? $rawValue : null;
+    }
+
+    private static function getIntegerValueFromRaw(mixed $rawValue): ?int {
+        return is_int($rawValue) ? $rawValue : null;
+    }
+
+    private static function getFloatValueFromRaw(mixed $rawValue): ?float {
+        if (is_float($rawValue)) {
+            return $rawValue;
         }
-        if (is_int($this->jsonNode)) {
-            return floatval($this->jsonNode);
+        if (is_int($rawValue)) {
+            return floatval($rawValue);
         }
         return null;
     }
@@ -91,11 +107,9 @@ class JsonParseNode implements ParseNode
         if (!is_array($this->jsonNode)) {
             return null;
         }
-        $result = array_map(static function ($val) use($type) {
-            return $val->getObjectValue($type);
-        }, array_map(static function ($value) {
-            return new JsonParseNode($value);
-        }, $this->jsonNode));
+        $result = array_map(static function ($value) use ($type) {
+            return (new JsonParseNode($value))->getObjectValue($type);
+        }, $this->jsonNode);
         return array_filter($result, fn ($item) => !is_null($item));
     }
 
@@ -177,11 +191,15 @@ class JsonParseNode implements ParseNode
         if (!is_array($this->jsonNode)) {
             return null;
         }
-        $result = array_map(static function ($val) use($targetClass) {
-            return $val->getEnumValue($targetClass);
-        }, array_map(static function ($value) {
-            return new JsonParseNode($value);
-        }, $this->jsonNode));
+        if (!is_subclass_of($targetClass, Enum::class)) {
+            throw new InvalidArgumentException('Invalid enum provided.');
+        }
+        $result = array_map(static function ($x) use ($targetClass) {
+            if ($x === null) {
+                return null;
+            }
+            return new $targetClass($x);
+        }, $this->jsonNode);
         return array_filter($result, fn ($item) => !is_null($item));
     }
 
@@ -223,7 +241,32 @@ class JsonParseNode implements ParseNode
         }
         return array_map(static function ($x) use ($typeName) {
             $type = empty($typeName) ? get_debug_type($x) : $typeName;
-            return (new JsonParseNode($x))->getAnyValue($type);
+            switch ($type) {
+                case 'bool':
+                    return JsonParseNode::getBooleanValueFromRaw($x);
+                case 'string':
+                    return JsonParseNode::getStringValueFromRaw($x);
+                case 'int':
+                    return JsonParseNode::getIntegerValueFromRaw($x);
+                case 'float':
+                    return JsonParseNode::getFloatValueFromRaw($x);
+                case 'null':
+                    return null;
+                case 'array':
+                    return (new JsonParseNode($x))->getCollectionOfPrimitiveValues();
+                case Date::class:
+                    return JsonParseNode::getDateValueFromRaw($x);
+                case Time::class:
+                    return JsonParseNode::getTimeValueFromRaw($x);
+                default:
+                    if (is_subclass_of($type, Enum::class)) {
+                        return $x !== null ? new $type($x) : null;
+                    }
+                    if (is_subclass_of($type, StreamInterface::class)) {
+                        return (new JsonParseNode($x))->getBinaryContent();
+                    }
+                    throw new InvalidArgumentException("Unable to decode type $type");
+            }
         }, $this->jsonNode);
     }
 
@@ -266,7 +309,7 @@ class JsonParseNode implements ParseNode
      * @throws Exception
      */
     public function getDateValue(): ?Date {
-        return ($this->jsonNode !== null) ? new Date(strval($this->jsonNode)) : null;
+        return self::getDateValueFromRaw($this->jsonNode);
     }
 
     /**
@@ -274,7 +317,15 @@ class JsonParseNode implements ParseNode
      * @throws Exception
      */
     public function getTimeValue(): ?Time {
-        return ($this->jsonNode !== null) ? new Time(strval($this->jsonNode)) : null;
+        return self::getTimeValueFromRaw($this->jsonNode);
+    }
+
+    private static function getDateValueFromRaw(mixed $rawValue): ?Date {
+        return ($rawValue !== null) ? new Date(strval($rawValue)) : null;
+    }
+
+    private static function getTimeValueFromRaw(mixed $rawValue): ?Time {
+        return ($rawValue !== null) ? new Time(strval($rawValue)) : null;
     }
 
     /**
