@@ -86,6 +86,115 @@ class JsonParseNodeTest extends TestCase
     /**
      * @throws Exception
      */
+    public function testGetCollectionOfPrimitiveValuesStrings(): void {
+        $this->parseNode = new JsonParseNode(['hello', 'world', 'foo']);
+        $expected = $this->parseNode->getCollectionOfPrimitiveValues();
+        $this->assertEquals(['hello', 'world', 'foo'], $expected);
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function testGetCollectionOfPrimitiveValuesBooleans(): void {
+        $this->parseNode = new JsonParseNode([true, false, true]);
+        $expected = $this->parseNode->getCollectionOfPrimitiveValues();
+        $this->assertEquals([true, false, true], $expected);
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function testGetCollectionOfPrimitiveValuesFloats(): void {
+        $this->parseNode = new JsonParseNode([1.1, 2.2, 3.3]);
+        $expected = $this->parseNode->getCollectionOfPrimitiveValues();
+        $this->assertEqualsWithDelta([1.1, 2.2, 3.3], $expected, 0.0001);
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function testGetCollectionOfPrimitiveValuesNulls(): void {
+        $this->parseNode = new JsonParseNode([1, null, 3]);
+        $expected = $this->parseNode->getCollectionOfPrimitiveValues();
+        $this->assertEquals([1, null, 3], $expected);
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function testGetCollectionOfPrimitiveValuesWithExplicitStringType(): void {
+        $this->parseNode = new JsonParseNode(['2022-01-27', '2023-06-15']);
+        $expected = $this->parseNode->getCollectionOfPrimitiveValues(Date::class);
+        $this->assertCount(2, $expected);
+        $this->assertInstanceOf(Date::class, $expected[0]);
+        $this->assertInstanceOf(Date::class, $expected[1]);
+        $this->assertEquals('2022-01-27', (string)$expected[0]);
+        $this->assertEquals('2023-06-15', (string)$expected[1]);
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function testGetCollectionOfPrimitiveValuesWithTimeType(): void {
+        $this->parseNode = new JsonParseNode(['12:30:00', '08:15:45']);
+        $expected = $this->parseNode->getCollectionOfPrimitiveValues(Time::class);
+        $this->assertCount(2, $expected);
+        $this->assertInstanceOf(Time::class, $expected[0]);
+        $this->assertInstanceOf(Time::class, $expected[1]);
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function testGetCollectionOfPrimitiveValuesWithEnumType(): void {
+        $this->parseNode = new JsonParseNode(['married', 'single']);
+        $expected = $this->parseNode->getCollectionOfPrimitiveValues(MaritalStatus::class);
+        $this->assertCount(2, $expected);
+        $this->assertInstanceOf(MaritalStatus::class, $expected[0]);
+        $this->assertEquals('married', $expected[0]->value());
+        $this->assertEquals('single', $expected[1]->value());
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function testGetCollectionOfPrimitiveValuesReturnsNullForNonArray(): void {
+        $this->parseNode = new JsonParseNode('not-an-array');
+        $expected = $this->parseNode->getCollectionOfPrimitiveValues();
+        $this->assertNull($expected);
+    }
+
+    public function testGetCollectionOfEnumValues(): void {
+        $this->parseNode = new JsonParseNode(['married', 'single', 'divorced']);
+        $expected = $this->parseNode->getCollectionOfEnumValues(MaritalStatus::class);
+        $this->assertCount(3, $expected);
+        $this->assertInstanceOf(MaritalStatus::class, $expected[0]);
+        $this->assertEquals('married', $expected[0]->value());
+        $this->assertEquals('single', $expected[1]->value());
+        $this->assertEquals('divorced', $expected[2]->value());
+    }
+
+    public function testGetCollectionOfEnumValuesFiltersNulls(): void {
+        $this->parseNode = new JsonParseNode(['married', null, 'single']);
+        $expected = $this->parseNode->getCollectionOfEnumValues(MaritalStatus::class);
+        $this->assertCount(2, $expected);
+    }
+
+    public function testGetCollectionOfEnumValuesReturnsNullForNonArray(): void {
+        $this->parseNode = new JsonParseNode('married');
+        $expected = $this->parseNode->getCollectionOfEnumValues(MaritalStatus::class);
+        $this->assertNull($expected);
+    }
+
+    public function testGetCollectionOfEnumValuesThrowsForInvalidClass(): void {
+        $this->parseNode = new JsonParseNode(['married']);
+        $this->expectException(\InvalidArgumentException::class);
+        $this->parseNode->getCollectionOfEnumValues(\stdClass::class);
+    }
+
+    /**
+     * @throws Exception
+     */
     public function testGetAnyValue(): void {
         $this->parseNode = new JsonParseNode(12);
         $expectedInteger = $this->parseNode->getAnyValue('int');
