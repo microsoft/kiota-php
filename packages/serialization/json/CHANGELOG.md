@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.1](https://github.com/microsoft/kiota-php/compare/microsoft-kiota-serialization-json-v2.0.0...microsoft-kiota-serialization-json-v2.0.1) (2026-03-13)
+
+
+### Bug Fixes
+
+* reduce parse node allocations when deserializing primitive types ([24eda87](https://github.com/microsoft/kiota-php/commit/24eda872bcfe883fdfafae44b259f735a03c61c1))
+
+
+### Performance Improvements
+
+* reduce parse node allocations when deserializing primitive types ([fc07fcb](https://github.com/microsoft/kiota-php/commit/fc07fcbea5511ffecbf35096b4feeca97a1a1242))
+
 ## [2.0.0](https://github.com/microsoft/kiota-php/compare/microsoft-kiota-serialization-json-v1.5.2...microsoft-kiota-serialization-json-v2.0.0) (2026-02-24)
 
 
