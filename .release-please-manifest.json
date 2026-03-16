@@ -1,10 +1,10 @@
 {
-	"packages/abstractions": "2.0.0",
-	"packages/authentication/phpleague": "2.0.0",
-	"packages/http/guzzle": "2.0.0",
-	"packages/serialization/form": "2.0.0",
-	"packages/serialization/text": "2.0.0",
-	"packages/serialization/json": "2.0.0",
-	"packages/serialization/multipart": "2.0.0",
-	"packages/bundle": "2.0.0"
+	"packages/abstractions": "2.0.1",
+	"packages/authentication/phpleague": "2.0.1",
+	"packages/http/guzzle": "2.0.1",
+	"packages/serialization/form": "2.0.1",
+	"packages/serialization/text": "2.0.1",
+	"packages/serialization/json": "2.0.1",
+	"packages/serialization/multipart": "2.0.1",
+	"packages/bundle": "2.0.1"
 }
