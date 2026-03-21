@@ -8,18 +8,18 @@
 
 namespace Microsoft\Kiota\Abstractions;
 
+use Attribute;
+
 /**
  * Class QueryParameter
  *
- * Attribute/annotation for query parameter class  properties
+ * Attribute for query parameter class properties
  *
- * @Annotation
- * @Target("PROPERTY")
- * @NamedArgumentConstructor
  * @package Microsoft\Kiota\Abstractions
  * @copyright 2022 Microsoft Corporation
  * @license https://opensource.org/licenses/MIT MIT License
  */
+#[Attribute(Attribute::TARGET_PROPERTY)]
 class QueryParameter
 {
     /**

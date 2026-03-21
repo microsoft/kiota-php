@@ -4,7 +4,6 @@ namespace Microsoft\Kiota\Abstractions;
 use DateInterval;
 use DateTime;
 use DateTimeInterface;
-use Doctrine\Common\Annotations\AnnotationReader;
 use Exception;
 use InvalidArgumentException;
 use Microsoft\Kiota\Abstractions\Serialization\Parsable;
@@ -47,7 +46,6 @@ class RequestInformation {
     private static string $binaryContentType = 'application/octet-stream';
     /** @var non-empty-string $contentTypeHeader */
     public static string $contentTypeHeader = 'Content-Type';
-    private static AnnotationReader $annotationReader;
     /**
      * @var ObservabilityOptions $observabilityOptions
      */
@@ -62,8 +60,6 @@ class RequestInformation {
         $this->headers = new RequestHeaders();
         $this->observabilityOptions = $observabilityOptions ?? new ObservabilityOptions();
         $this->tracer = $this->observabilityOptions::getTracer();
-        // Init annotation utils
-        self::$annotationReader = new AnnotationReader();
     }
 
     /** Gets the URI of the request.
@@ -314,10 +310,12 @@ class RequestInformation {
         $reflectionClass = new \ReflectionClass($queryParameters);
         foreach ($reflectionClass->getProperties() as $classProperty) {
             $propertyValue = $classProperty->getValue($queryParameters);
-            $propertyAnnotation = self::$annotationReader->getPropertyAnnotation($classProperty, QueryParameter::class);
+            $attribute = $classProperty->getAttributes(QueryParameter::class);
             if ($propertyValue) {
-                if ($propertyAnnotation) {
-                    $this->queryParameters[$propertyAnnotation->name] = $propertyValue;
+                if (!empty($attribute)) {
+                    /** @var QueryParameter $queryParamInstance */
+                    $queryParamInstance = $attribute[0]->newInstance();
+                    $this->queryParameters[$queryParamInstance->name] = $propertyValue;
                     continue;
                 }
                 $this->queryParameters[$classProperty->name] = $propertyValue;

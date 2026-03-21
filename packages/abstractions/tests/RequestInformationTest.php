@@ -219,8 +219,8 @@ class RequestInformationTest extends TestCase {
 class TestQueryParameter {
     /**
      * @var string[]|null
-     * @QueryParameter("%24select")
      */
+    #[QueryParameter("%24select")]
     public ?array $select = null;
     public bool $count = false;
     public int $top = 10; // no annotation
