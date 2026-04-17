@@ -322,8 +322,8 @@ class RequestInformation {
     }
 
     /**
-     * Resolve the custom `@QueryParameter("name")` docblock annotation (or
-     * native `#[QueryParameter("name")]` attribute) on a reflected property.
+     * Resolve the custom `@QueryParameter("name")` docblock annotation on a
+     * reflected property.
      *
      * Replaces the previous `doctrine/annotations` lookup with native parsing
      * so the abandoned Doctrine dependency can be dropped without touching
@@ -331,13 +331,6 @@ class RequestInformation {
      */
     private static function readQueryParameterName(\ReflectionProperty $property): ?string
     {
-        $attributes = $property->getAttributes(QueryParameter::class);
-        if (!empty($attributes)) {
-            /** @var QueryParameter $instance */
-            $instance = $attributes[0]->newInstance();
-            return $instance->name;
-        }
-
         $docComment = $property->getDocComment();
         if ($docComment !== false && preg_match('/@QueryParameter\(\s*"([^"]+)"\s*\)/', $docComment, $matches) === 1) {
             return $matches[1];
