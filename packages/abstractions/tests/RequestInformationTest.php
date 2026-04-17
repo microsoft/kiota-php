@@ -87,6 +87,32 @@ class RequestInformationTest extends TestCase {
     }
 
     /**
+     * Regression test for preserving explicit falsy query parameter values.
+     * The previous `if ($propertyValue)` guard dropped `0`, `false`, and `""`
+     * even when explicitly set on the query parameters object. Switched to
+     * `!== null` to align with the not-null semantics used by kiota-dotnet,
+     * kiota-java, and kiota-typescript.
+     *
+     * @throws InvalidArgumentException
+     */
+    public function testSetQueryParametersPreservesFalsyValues(): void {
+        $this->requestInformation->urlTemplate = '{?%24count,top,search}';
+
+        $queryParam = new TestFalsyQueryParameter();
+        $queryParam->count  = false;
+        $queryParam->top    = 0;
+        $queryParam->search = '';
+        $this->requestInformation->setQueryParameters($queryParam);
+
+        $this->assertArrayHasKey('%24count', $this->requestInformation->queryParameters);
+        $this->assertFalse($this->requestInformation->queryParameters['%24count']);
+        $this->assertArrayHasKey('top', $this->requestInformation->queryParameters);
+        $this->assertSame(0, $this->requestInformation->queryParameters['top']);
+        $this->assertArrayHasKey('search', $this->requestInformation->queryParameters);
+        $this->assertSame('', $this->requestInformation->queryParameters['search']);
+    }
+
+    /**
      * @throws InvalidArgumentException
      */
     public function testWillThrowExceptionWhenNoBaseUrl(): void {
@@ -278,6 +304,15 @@ class TestQueryParameterDocblock {
     public ?string $orderby = null;
 
     public ?string $plain = null; // no annotation → falls back to field name
+}
+
+class TestFalsyQueryParameter {
+    /**
+     * @QueryParameter("%24count")
+     */
+    public ?bool $count = null;
+    public ?int $top = null;       // no annotation → falls back to field name
+    public ?string $search = null; // no annotation → falls back to field name
 }
 
 class TestEnum extends Enum {
