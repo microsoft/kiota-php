@@ -252,7 +252,7 @@ class TestQueryParameter {
      * @QueryParameter("%24select")
      */
     public ?array $select = null;
-    public bool $count = false;
+    public ?bool $count = null;
     public int $top = 10; // no annotation
     /** @var array<TestEnum>|null */
     public ?array $enum = null;

@@ -310,7 +310,7 @@ class RequestInformation {
         $reflectionClass = new \ReflectionClass($queryParameters);
         foreach ($reflectionClass->getProperties() as $classProperty) {
             $propertyValue = $classProperty->getValue($queryParameters);
-            if ($propertyValue) {
+            if ($propertyValue !== null) {
                 $annotatedName = self::readQueryParameterName($classProperty);
                 if ($annotatedName !== null) {
                     $this->queryParameters[$annotatedName] = $propertyValue;
