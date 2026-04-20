@@ -11,7 +11,7 @@
     ],
     "require": {
         "php": "^8.2",
-        "microsoft/kiota-abstractions": "^2.0.1",
+        "microsoft/kiota-abstractions": "^2.0.2",
         "guzzlehttp/psr7": "^1.6 || ^2"
     },
     "require-dev": {
