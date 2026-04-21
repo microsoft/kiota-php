@@ -67,7 +67,6 @@
 		}
 	],
     "require": {
-        "doctrine/annotations": "^1.13 || ^2.0",
         "ext-json": "*",
         "ext-openssl": "*",
         "ext-zlib": "*",

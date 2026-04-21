@@ -13,7 +13,7 @@ run `composer require microsoft/kiota-serialization-text` or add the following t
 {
     "require": {
         // x-release-please-start-version
-        "microsoft/kiota-serialization-text": "^2.0.1"
+        "microsoft/kiota-serialization-text": "^2.0.2"
         // x-release-please-end
     }
 }
