@@ -9,6 +9,7 @@ use Psr\Http\Message\RequestInterface;
 
 class UrlReplaceHandler
 {
+    public const HANDLER_NAME = 'kiotaUrlReplaceHandler';
     private UrlReplaceOption $urlReplaceOptions;
 
     /**
