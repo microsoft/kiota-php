@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
@@ -34,7 +34,7 @@ jobs:
         php-versions: ['8.2', '8.3', '8.4', '8.5']
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
@@ -53,7 +53,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           # Disabling shallow clones is recommended for improving the relevancy of reporting
           fetch-depth: 0
