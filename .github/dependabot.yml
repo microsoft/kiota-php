@@ -2,13 +2,17 @@ version: 2
 updates:
 - package-ecosystem: composer
   directories:
-    - "/"
-    - "packages/**"
+  - /
+  - packages/**
   schedule:
     interval: daily
   open-pull-requests-limit: 10
+  cooldown:
+    default-days: 7
 - package-ecosystem: github-actions
-  directory: "/"
+  directory: /
   schedule:
     interval: daily
   open-pull-requests-limit: 10
+  cooldown:
+    default-days: 7
