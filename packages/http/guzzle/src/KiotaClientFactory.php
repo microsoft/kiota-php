@@ -17,6 +17,8 @@ use Microsoft\Kiota\Http\Middleware\HeadersInspectionHandler;
 use Microsoft\Kiota\Http\Middleware\KiotaMiddleware;
 use Microsoft\Kiota\Http\Middleware\ParametersNameDecodingHandler;
 use Microsoft\Kiota\Http\Middleware\RetryHandler;
+use Microsoft\Kiota\Http\Middleware\SunsetHandler;
+use Microsoft\Kiota\Http\Middleware\UrlReplaceHandler;
 use Microsoft\Kiota\Http\Middleware\UserAgentHandler;
 
 /**
@@ -72,9 +74,11 @@ class KiotaClientFactory
     {
         $handlerStack = new HandlerStack(Utils::chooseHandler());
         $handlerStack->push(KiotaMiddleware::parameterNamesDecoding(), ParametersNameDecodingHandler::HANDLER_NAME);
+        $handlerStack->push(KiotaMiddleware::urlReplace(), UrlReplaceHandler::HANDLER_NAME);
         $handlerStack->push(GuzzleMiddleware::redirect(), 'kiotaRedirectHandler');
         $handlerStack->push(KiotaMiddleware::userAgent(), UserAgentHandler::HANDLER_NAME);
         $handlerStack->push(KiotaMiddleware::retry(), RetryHandler::HANDLER_NAME);
+        $handlerStack->push(KiotaMiddleware::sunset(), SunsetHandler::HANDLER_NAME);
         $handlerStack->push(KiotaMiddleware::headersInspection(), HeadersInspectionHandler::HANDLER_NAME);
         return $handlerStack;
     }
