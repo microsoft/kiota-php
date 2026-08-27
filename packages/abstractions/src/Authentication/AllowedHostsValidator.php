@@ -66,7 +66,21 @@ class AllowedHostsValidator
      */
     public function isUrlHostValid(string $url): bool
     {
-        return empty($this->allowedHosts) || array_key_exists($this->extractHost($url), $this->allowedHosts);
+        if (empty($this->allowedHosts)) {
+            return true;
+        }
+
+        $host = $this->extractHost($url);
+        if (array_key_exists($host, $this->allowedHosts)) {
+            return true;
+        }
+
+        foreach ($this->allowedHosts as $allowedHost => $_) {
+            if (str_starts_with($allowedHost, ".") && str_ends_with($host, $allowedHost)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
