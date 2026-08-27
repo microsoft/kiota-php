@@ -75,6 +75,15 @@ class AllowedHostsValidator
             return true;
         }
 
+        return $this->isAllowedHostSuffix($host);
+    }
+
+    /**
+     * @param string $host
+     * @return bool
+     */
+    private function isAllowedHostSuffix(string $host): bool
+    {
         foreach ($this->allowedHosts as $allowedHost => $_) {
             if (str_starts_with($allowedHost, ".") && str_ends_with($host, $allowedHost)) {
                 return true;
