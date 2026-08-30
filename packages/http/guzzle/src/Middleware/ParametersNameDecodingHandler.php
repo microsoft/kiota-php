@@ -116,18 +116,22 @@ class ParametersNameDecodingHandler
         if (!$queryParams) {
             return $original;
         }
-        $queryParamKeyValues = [];
-        foreach (explode("&", $queryParams) as $nameValueString) {
-            $nameVal = explode("=", $nameValueString);
-            $queryParamKeyValues[$nameVal[0]] = $nameVal[1] ?? '';
-        }
         $encodingsToReplace = array_map(fn ($character) => "%".dechex(ord($character)), $charactersToDecode);
+        // the pairs are kept as a list, not a map: a parameter may legitimately appear more than
+        // once, and only the name is decoded - the value (which may itself contain "=") is untouched
         $decodedQueryParams = [];
-        foreach ($queryParamKeyValues as $key => $val) {
-            $decodedKey = str_ireplace($encodingsToReplace, $charactersToDecode, $key);
-            $decodedQueryParams [] = "{$decodedKey}={$val}";
+        foreach (explode("&", $queryParams) as $nameValueString) {
+            $nameVal = explode("=", $nameValueString, 2);
+            $decodedKey = str_ireplace($encodingsToReplace, $charactersToDecode, $nameVal[0]);
+            $decodedQueryParams[] = isset($nameVal[1]) ? "{$decodedKey}={$nameVal[1]}" : $decodedKey;
         }
-        /** @returns string $decodedUri */
-        return str_replace($queryParams, implode("&", $decodedQueryParams), $original);
+        // replace only the query component: the same text may also occur in the path
+        $queryStart = strpos($original, '?');
+        if ($queryStart === false) {
+            return $original;
+        }
+        $fragmentStart = strpos($original, '#', $queryStart);
+        $suffix = $fragmentStart === false ? '' : substr($original, $fragmentStart);
+        return substr($original, 0, $queryStart + 1) . implode("&", $decodedQueryParams) . $suffix;
     }
 }
