@@ -18,7 +18,7 @@ run `composer require microsoft/kiota-serialization-json` or add the following t
 {
     "require": {
         // x-release-please-start-version
-        "microsoft/kiota-serialization-multipart": "^2.1.0"
+        "microsoft/kiota-serialization-multipart": "^2.1.1"
         // x-release-please-end
     }
 }
