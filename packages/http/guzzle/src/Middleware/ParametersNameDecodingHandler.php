@@ -106,6 +106,7 @@ class ParametersNameDecodingHandler
      * @param string|null $original
      * @param array<string>|null $charactersToDecode
      * @return string
+     * @throws InvalidArgumentException
      */
     public static function decodeUriEncodedString(?string $original = null, ?array $charactersToDecode = null): string
     {
@@ -125,13 +126,12 @@ class ParametersNameDecodingHandler
             $decodedKey = str_ireplace($encodingsToReplace, $charactersToDecode, $nameVal[0]);
             $decodedQueryParams[] = isset($nameVal[1]) ? "{$decodedKey}={$nameVal[1]}" : $decodedKey;
         }
-        // replace only the query component: the same text may also occur in the path
+        // splice the decoded names back over the query component alone: the same text may
+        // also occur in the path, which a str_replace across the url would rewrite too
         $queryStart = strpos($original, '?');
         if ($queryStart === false) {
-            return $original;
+            throw new InvalidArgumentException("parse_url reported a query for \"{$original}\" but it has no '?'");
         }
-        $fragmentStart = strpos($original, '#', $queryStart);
-        $suffix = $fragmentStart === false ? '' : substr($original, $fragmentStart);
-        return substr($original, 0, $queryStart + 1) . implode("&", $decodedQueryParams) . $suffix;
+        return substr_replace($original, implode("&", $decodedQueryParams), $queryStart + 1, strlen($queryParams));
     }
 }
