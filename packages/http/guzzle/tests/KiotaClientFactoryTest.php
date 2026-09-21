@@ -9,6 +9,7 @@ use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
 use Microsoft\Kiota\Http\Constants;
 use Microsoft\Kiota\Http\KiotaClientFactory;
+use Microsoft\Kiota\Http\Middleware\Options\RetryOption;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\RequestInterface;
 
@@ -28,6 +29,52 @@ class KiotaClientFactoryTest extends TestCase
     public function testGetDefaultHandlerStack()
     {
         $this->assertInstanceOf(HandlerStack::class, KiotaClientFactory::getDefaultHandlerStack());
+    }
+
+
+    /**
+     * @dataProvider queryRetryStatusCodes
+     */
+    public function testQueryRequestRetry(int $statusCode): void
+    {
+        $uri = 'https://graph.microsoft.com/users';
+        $body = '{"displayName":"Ada"}';
+        $mockHandler = new MockHandler([
+            function (RequestInterface $request) use ($statusCode, $uri, $body) {
+                $this->assertSame('QUERY', $request->getMethod());
+                $this->assertSame($uri, (string) $request->getUri());
+                // Consume the body to verify it is rewound before retrying.
+                $this->assertSame($body, $request->getBody()->getContents());
+                return new Response($statusCode);
+            },
+            function (RequestInterface $request) use ($uri, $body) {
+                $this->assertSame('QUERY', $request->getMethod());
+                $this->assertSame($uri, (string) $request->getUri());
+                $this->assertSame($body, $request->getBody()->getContents());
+                $this->assertSame('1', $request->getHeaderLine('Retry-Attempt'));
+                return new Response(200);
+            }
+        ]);
+        $middlewareStack = KiotaClientFactory::getDefaultHandlerStack();
+        $middlewareStack->setHandler($mockHandler);
+        $client = KiotaClientFactory::createWithMiddleware($middlewareStack);
+
+        $response = $client->request('QUERY', $uri, [
+            'body' => $body,
+            RetryOption::class => new RetryOption(1, 0)
+        ]);
+
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertCount(0, $mockHandler);
+    }
+
+    public static function queryRetryStatusCodes(): array
+    {
+        return [
+            '429 retry' => [429],
+            '503 retry' => [503],
+            '504 retry' => [504]
+        ];
     }
 
     public function testMiddlewareProcessing()
