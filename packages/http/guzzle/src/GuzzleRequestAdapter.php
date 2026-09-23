@@ -543,7 +543,9 @@ class GuzzleRequestAdapter implements RequestAdapter
                 function () use ($requestInfo, &$httpResponseSpan) {
                     $psrRequest = $this->getPsrRequestFromRequestInformation($requestInfo, $httpResponseSpan);
                     $httpResponseSpan->setStatus(StatusCode::STATUS_OK, 'Request Information Success');
-                    return $this->guzzleClient->send($psrRequest, $requestInfo->getRequestOptions());
+                    /** @var \Psr\Http\Message\ResponseInterface $response */
+                    $response = $this->guzzleClient->sendAsync($psrRequest, $requestInfo->getRequestOptions())->wait();
+                    return $response;
                 }
             )->then(
                 function (ResponseInterface $response) use ($requestInfo, $claims, &$httpResponseSpan) {
