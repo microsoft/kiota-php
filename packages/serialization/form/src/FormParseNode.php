@@ -366,7 +366,7 @@ class FormParseNode implements ParseNode
         if ($this->isNull()) {
             return null;
         } elseif (is_array($this->node)) {
-            return Utils::streamFor(json_encode($this->node));
+            return Utils::streamFor(json_encode($this->node) ?: '');
         }
         return Utils::streamFor(strval($this->node));
     }
