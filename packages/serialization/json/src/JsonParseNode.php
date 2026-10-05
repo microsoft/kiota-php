@@ -351,7 +351,7 @@ class JsonParseNode implements ParseNode
         if (is_null($this->jsonNode)) {
             return null;
         } elseif (is_array($this->jsonNode)) {
-            return Utils::streamFor(json_encode($this->jsonNode) ?: '');
+            return Utils::streamFor(json_encode($this->jsonNode, JSON_THROW_ON_ERROR));
         }
         return Utils::streamFor(strval($this->jsonNode));
     }
