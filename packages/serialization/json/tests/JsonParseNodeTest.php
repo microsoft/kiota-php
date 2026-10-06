@@ -322,4 +322,10 @@ class JsonParseNodeTest extends TestCase
         $expected->invert = 1;
         $this->assertEquals($this->parseNode->getDateIntervalValue(), $expected);
     }
+
+    public function testGetBinaryContentFromArrayWithInvalidUtf8Throws(): void {
+        $this->parseNode = new JsonParseNode(['name' => "\xB1\x31"]);
+        $this->expectException(\JsonException::class);
+        $this->parseNode->getBinaryContent();
+    }
 }
