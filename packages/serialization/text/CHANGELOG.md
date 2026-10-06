@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.0](https://github.com/microsoft/kiota-php/compare/microsoft-kiota-serialization-text-v2.1.1...microsoft-kiota-serialization-text-v2.2.0) (2026-10-06)
+
+
+### Features
+
+* add support for Guzzle 8 ([#110](https://github.com/microsoft/kiota-php/issues/110)) ([fe8f997](https://github.com/microsoft/kiota-php/commit/fe8f9973bdce074234fe4d187b2437207f5874cf))
+
 ## [2.1.1](https://github.com/microsoft/kiota-php/compare/microsoft-kiota-serialization-text-v2.1.0...microsoft-kiota-serialization-text-v2.1.1) (2026-08-31)
 
 
