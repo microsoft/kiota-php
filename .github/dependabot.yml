@@ -10,7 +10,15 @@ updates:
   cooldown:
     default-days: 7
 - package-ecosystem: github-actions
-  directory: /
+  directories:
+  - /
+  - /packages/abstractions
+  - /packages/authentication/phpleague
+  - /packages/http/guzzle
+  - /packages/serialization/form
+  - /packages/serialization/json
+  - /packages/serialization/multipart
+  - /packages/serialization/text
   schedule:
     interval: daily
   open-pull-requests-limit: 10
