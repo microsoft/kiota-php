@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.2.2](https://github.com/microsoft/kiota-php/compare/microsoft-kiota-bundle-v2.2.1...microsoft-kiota-bundle-v2.2.2) (2026-10-21)
+
+
+### Miscellaneous Chores
+
+* **microsoft-kiota-bundle:** Synchronize microsoft-kiota-php versions
+
 ## [2.2.1](https://github.com/microsoft/kiota-php/compare/microsoft-kiota-bundle-v2.2.0...microsoft-kiota-bundle-v2.2.1) (2026-10-08)
 
 
