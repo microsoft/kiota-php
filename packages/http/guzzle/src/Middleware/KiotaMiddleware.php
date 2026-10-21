@@ -8,9 +8,11 @@
 
 namespace Microsoft\Kiota\Http\Middleware;
 
+use Microsoft\Kiota\Http\Middleware\Options\BodyInspectionOption;
 use Microsoft\Kiota\Http\Middleware\Options\ChaosOption;
 use Microsoft\Kiota\Http\Middleware\Options\CompressionOption;
 use Microsoft\Kiota\Http\Middleware\Options\HeadersInspectionHandlerOption;
+use Microsoft\Kiota\Http\Middleware\Options\SunsetOption;
 use Microsoft\Kiota\Http\Middleware\Options\ParametersDecodingOption;
 use Microsoft\Kiota\Http\Middleware\Options\RetryOption;
 use Microsoft\Kiota\Http\Middleware\Options\TelemetryOption;
@@ -120,6 +122,34 @@ class KiotaMiddleware
     {
         return static function (callable $handler) use ($headersInspectionOption): HeadersInspectionHandler {
             return new HeadersInspectionHandler($handler, $headersInspectionOption);
+        };
+    }
+
+    /**
+     * Middleware that allows inspection of the request and response bodies.
+     * Configured using {@link BodyInspectionOption}
+     *
+     * @param BodyInspectionOption|null $bodyInspectionOption
+     * @return callable
+     */
+    public static function bodyInspection(?BodyInspectionOption $bodyInspectionOption = null): callable
+    {
+        return static function (callable $handler) use ($bodyInspectionOption): BodyInspectionHandler {
+            return new BodyInspectionHandler($handler, $bodyInspectionOption);
+        };
+    }
+
+    /**
+     * Middleware that detects Sunset and Link (rel="sunset") headers to warn about API deprecation.
+     * Configured using {@link SunsetOption}
+     *
+     * @param SunsetOption|null $sunsetOption
+     * @return callable
+     */
+    public static function sunset(?SunsetOption $sunsetOption = null): callable
+    {
+        return static function (callable $handler) use ($sunsetOption): SunsetHandler {
+            return new SunsetHandler($handler, $sunsetOption);
         };
     }
 }
