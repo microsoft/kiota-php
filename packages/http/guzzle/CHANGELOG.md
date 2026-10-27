@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.3](https://github.com/microsoft/kiota-php/compare/microsoft-kiota-http-guzzle-v2.2.2...microsoft-kiota-http-guzzle-v2.2.3) (2026-10-27)
+
+
+### Bug Fixes
+
+* **http-guzzle:** allow UserAgentHandler to be constructed with default options ([#123](https://github.com/microsoft/kiota-php/issues/123)) ([5c599cb](https://github.com/microsoft/kiota-php/commit/5c599cba9f803ba648f1598be31c2a7008f61c01))
+* **http-guzzle:** isolate request options and fix span name in HeadersInspectionHandler ([#126](https://github.com/microsoft/kiota-php/issues/126)) ([4f3859c](https://github.com/microsoft/kiota-php/commit/4f3859c4b7b9aeb5e0a4c837206733c90f72d44f))
+* **http-guzzle:** isolate request options and fix span name in ParametersNameDecodingHandler ([#127](https://github.com/microsoft/kiota-php/issues/127)) ([de6ea56](https://github.com/microsoft/kiota-php/commit/de6ea563f9c17cb35e681a6f776fa61dd6345645))
+* **http-guzzle:** isolate request options in CompressionHandler ([#128](https://github.com/microsoft/kiota-php/issues/128)) ([41b4a69](https://github.com/microsoft/kiota-php/commit/41b4a698d7374ef5fedfe1082fea8cc259f6af80))
+
 ## [2.2.2](https://github.com/microsoft/kiota-php/compare/microsoft-kiota-http-guzzle-v2.2.1...microsoft-kiota-http-guzzle-v2.2.2) (2026-10-21)
 
 
