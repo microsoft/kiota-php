@@ -90,6 +90,42 @@ class CompressionHandlerTest extends TestCase
         $this->assertEquals(200, $response->getStatusCode());
     }
 
+    public function testPerRequestOptionDoesNotLeakToSubsequentRequests(): void
+    {
+        $defaultOption = new CompressionOption([CompressionOption::gzip()]);
+        $customOption = new CompressionOption([CompressionOption::deflate()]);
+
+        $recordedEncodings = [];
+        $mockHandler = new MockHandler([
+            function (RequestInterface $request) use (&$recordedEncodings) {
+                $recordedEncodings[] = $request->getHeaderLine('Content-Encoding');
+                return new Response(200);
+            },
+            function (RequestInterface $request) use (&$recordedEncodings) {
+                $recordedEncodings[] = $request->getHeaderLine('Content-Encoding');
+                return new Response(200);
+            }
+        ]);
+        $handlerStack = new HandlerStack($mockHandler);
+        $handlerStack->push(KiotaMiddleware::compression($defaultOption));
+        $client = new Client(['handler' => $handlerStack, 'http_errors' => false]);
+
+        // Request 1 with custom per-request option (deflate)
+        $client->get('/', [
+            'body' => 'payload',
+            CompressionOption::class => $customOption
+        ]);
+
+        // Request 2 without options should use default handler option (gzip)
+        $client->get('/', [
+            'body' => 'payload'
+        ]);
+
+        $this->assertCount(2, $recordedEncodings);
+        $this->assertEquals('deflate', $recordedEncodings[0]);
+        $this->assertEquals('gzip', $recordedEncodings[1]);
+    }
+
     private function executeMockRequest(array $mockResponses, ?CompressionOption $compressionOption = null, ?array $requestOptions = [])
     {
         $mockHandler = new MockHandler($mockResponses);
