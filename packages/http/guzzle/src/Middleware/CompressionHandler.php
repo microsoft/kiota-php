@@ -78,8 +78,8 @@ class CompressionHandler
         $scope = $span->activate();
         try {
             $span->setAttribute(self::COMPRESSION_HANDLER_ENABLED_KEY, true);
+            // Request-level options override global options without mutating handler state
             $compressionOption = $this->compressionOption;
-            // Request-level options override global options
             if (array_key_exists(CompressionOption::class, $options) && $options[CompressionOption::class] instanceof CompressionOption) {
                 $compressionOption = $options[CompressionOption::class];
             }
