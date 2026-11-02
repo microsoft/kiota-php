@@ -158,6 +158,9 @@ class GuzzleRequestAdapter implements RequestAdapter
                     }
 
                     $this->throwFailedResponse($result, $errorMappings, $span);
+                    if ($this->shouldReturnNull($result)) {
+                        return null;
+                    }
                     $span->setStatus(StatusCode::STATUS_OK, 'response_handle_success');
                     if ($this->is204NoContentResponse($result)) {
                         return null;
@@ -229,6 +232,9 @@ class GuzzleRequestAdapter implements RequestAdapter
                         );
                     }
                     $this->throwFailedResponse($result, $errorMappings, $span);
+                    if ($this->shouldReturnNull($result)) {
+                        return null;
+                    }
                     if ($this->is204NoContentResponse($result)) {
                         return null;
                     }
@@ -268,6 +274,9 @@ class GuzzleRequestAdapter implements RequestAdapter
                         return $response->wait();
                     }
                     $this->throwFailedResponse($result, $errorMappings, $span);
+                    if ($this->shouldReturnNull($result)) {
+                        return null;
+                    }
                     $this->setResponseType($primitiveType, $span);
                     if ($this->is204NoContentResponse($result)) {
                         return null;
@@ -342,6 +351,9 @@ class GuzzleRequestAdapter implements RequestAdapter
                         );
                     }
                     $this->throwFailedResponse($result, $errorMappings, $span);
+                    if ($this->shouldReturnNull($result)) {
+                        return null;
+                    }
                     if ($this->is204NoContentResponse($result)) {
                         return null;
                     }
@@ -511,6 +523,61 @@ class GuzzleRequestAdapter implements RequestAdapter
     }
 
     /**
+     * Helper function to check if the response should return null.
+     *
+     * Conditions:
+     *  - The response status code is 204 or 304
+     *  - The response content is empty
+     *  - The response status code is 301 or 302 and the location header is not present
+     *
+     * @param ResponseInterface $response The HTTP response
+     * @return bool True if the response should return null, False otherwise
+     */
+    private function shouldReturnNull(ResponseInterface $response): bool
+    {
+        return $response->getStatusCode() === 204
+            || $response->getStatusCode() === 304
+            || empty((string)$response->getBody())
+            || (!$response->hasHeader('Location') && in_array($response->getStatusCode(), [301, 302]));
+    }
+
+    /**
+     * Checks if a redirect response is missing the Location header
+     *
+     * @param ResponseInterface $response The HTTP response
+     * @param SpanInterface $parentSpan
+     * @param SpanInterface $attributeSpan
+     * @return bool
+     * @throws ApiException 
+     */
+    private function isRedirectMissingLocation(
+        ResponseInterface $response,
+        SpanInterface $parentSpan,
+        SpanInterface $attributeSpan
+    ): bool {
+        $statusCode = $response->getStatusCode();
+        
+        // Check if it's a redirect status code (3xx)
+        if ($statusCode >= 300 && $statusCode < 400) {
+            if (!$response->hasHeader('Location')) {
+                $parentSpan->setStatus(StatusCode::STATUS_ERROR);
+                $attributeSpan->setStatus(StatusCode::STATUS_ERROR);
+                
+                throw new ApiException(
+                    sprintf(
+                        'Redirect status code %d returned without a Location header', 
+                        $statusCode
+                    )
+                );
+            }
+            return false;
+        }
+        
+        return true;
+    }
+
+    
+    /**
      * Authenticates and executes the request
      *
      * @param RequestInformation $requestInfo
@@ -620,6 +687,9 @@ class GuzzleRequestAdapter implements RequestAdapter
         if ($statusCode >= 200 && $statusCode < 400) {
             return;
         }
+        if (!$this->isRedirectMissingLocation($response, $span, $span)) {
+            return;
+        }
         $errorSpan = $this->tracer->spanBuilder('throwFailedResponses')
             ->setParent($currentContext)
             ->startSpan();
@@ -681,7 +751,6 @@ class GuzzleRequestAdapter implements RequestAdapter
                 $spanForDeserialization->end();
 
             }
-
             if ($error && is_subclass_of($error, ApiException::class)) {
                 $span->setAttribute(self::ERROR_BODY_FOUND_ATTRIBUTE_NAME, true);
                 $error->setResponseStatusCode($response->getStatusCode());
@@ -689,6 +758,7 @@ class GuzzleRequestAdapter implements RequestAdapter
                 $errorSpan->recordException($error, ['know_error' => true, 'message' => $responseBodyContents]);
                 throw $error;
             }
+
             $otherwise = new ApiException("Unsupported error type " . get_debug_type($error));
             $otherwise->setResponseStatusCode($response->getStatusCode());
             $otherwise->setResponseHeaders($response->getHeaders());
