@@ -263,8 +263,12 @@ class RequestInformation {
             }
             $this->headers->tryAdd(self::$contentTypeHeader, $contentType);
             $this->content = $writer->getSerializedContent();
+            $span->setStatus(StatusCode::STATUS_OK);
         } catch (Exception $exception) {
-            throw new RuntimeException('could not serialize payload.', 1, $exception);
+            $ex = new RuntimeException('could not serialize payload.', 1, $exception);
+            $span->recordException($ex);
+            $span->setStatus(StatusCode::STATUS_ERROR);
+            throw $ex;
         } finally {
             $scope->detach();
             $span->end();
