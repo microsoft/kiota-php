@@ -575,11 +575,30 @@ class GuzzleRequestAdapterTest extends TestCase
 
     public function testConvertToNativeWithUrlTemplateContainingBaseUrl(): void
     {
-        $requestAdapter = $this->mockRequestAdapter();
+        $authCalled = false;
+        $authenticationProvider = $this->createMock(AuthenticationProvider::class);
+        $authenticationProvider->expects($this->once())
+            ->method('authenticateRequest')
+            ->willReturnCallback(function (RequestInformation $request) use (&$authCalled) {
+                $authCalled = true;
+                $this->assertEquals($this->baseUrl . '/users', $request->getUri());
+                $request->addHeader('Bearer', 'token');
+                return new FulfilledPromise($request);
+            });
+
+        $requestAdapter = new GuzzleRequestAdapter(
+            $authenticationProvider,
+            $this->parseNodeFactory,
+            $this->createMock(SerializationWriterFactory::class),
+            new Client(['handler' => new MockHandler([])])
+        );
+        $requestAdapter->setBaseUrl($this->baseUrl);
+
         $requestInfo = new RequestInformation();
         $requestInfo->httpMethod = 'GET';
         $requestInfo->urlTemplate = '{+baseurl}/users';
         $request = $requestAdapter->convertToNative($requestInfo)->wait();
+        $this->assertTrue($authCalled);
         $this->assertInstanceOf(RequestInterface::class, $request);
         $this->assertEquals($this->baseUrl . '/users', strval($request->getUri()));
     }
