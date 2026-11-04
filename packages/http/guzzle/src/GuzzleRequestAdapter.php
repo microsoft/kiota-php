@@ -419,6 +419,19 @@ class GuzzleRequestAdapter implements RequestAdapter
     }
 
     /**
+     * Set the base URL on the RequestInformation path parameters if not already present or if the adapter has a non-empty base URL.
+     *
+     * @param RequestInformation $requestInformation
+     * @return void
+     */
+    private function setBaseUrlForRequestInformation(RequestInformation $requestInformation): void
+    {
+        $requestInformation->pathParameters['baseurl'] = !empty($this->getBaseUrl())
+            ? $this->getBaseUrl()
+            : ($requestInformation->pathParameters['baseurl'] ?? $this->getBaseUrl());
+    }
+
+    /**
      * Create and returns a PSR 7 Request object from {@link RequestInformation}
      *
      * @param RequestInformation $requestInformation
@@ -437,9 +450,10 @@ class GuzzleRequestAdapter implements RequestAdapter
             ->startSpan();
         $scope = $psrRequestFromInfoSpan->activate();
         try {
-            $requestInformation->pathParameters["baseurl"] = $this->getBaseUrl();
+            $this->setBaseUrlForRequestInformation($requestInformation);
             $span->setAttribute('http.request.method', $requestInformation->httpMethod);
-            $span->setAttribute('server.address', explode(':', $requestInformation->getUri())[0]);
+            $serverAddress = parse_url($requestInformation->getUri(), PHP_URL_HOST) ?? '';
+            $span->setAttribute('server.address', $serverAddress);
             if ($this->getObservabilityOptionsFromRequest($requestInformation)->getIncludeEUIIAttributes()) {
                 $span->setAttribute('url.full', $requestInformation->getUri());
             }
@@ -471,6 +485,7 @@ class GuzzleRequestAdapter implements RequestAdapter
         $span = $this->tracer->spanBuilder('convertToNative')->startSpan();
         $scope = $span->activate();
         try {
+            $this->setBaseUrlForRequestInformation($requestInformationInformation);
             $result = $this->authenticationProvider->authenticateRequest($requestInformationInformation)->then(
                 fn(RequestInformation $authedRequest): RequestInterface => $this->getPsrRequestFromRequestInformation(
                     $authedRequest, $span)
@@ -530,7 +545,7 @@ class GuzzleRequestAdapter implements RequestAdapter
         $httpResponseSpan = $httpResponseSpan->startSpan();
         $scope = $httpResponseSpan->activate();
         try {
-            $requestInfo->pathParameters['baseurl'] = $this->getBaseUrl();
+            $this->setBaseUrlForRequestInformation($requestInfo);
             try {
                 $requestInfo->getUri();
                 $span->setAttribute('com.microsoft.kiota.authentication.is_url_valid', true);
