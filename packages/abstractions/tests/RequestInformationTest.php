@@ -8,6 +8,7 @@ use Exception;
 use InvalidArgumentException;
 use Microsoft\Kiota\Abstractions\Enum;
 use Microsoft\Kiota\Abstractions\HttpMethod;
+use Microsoft\Kiota\Abstractions\ObservabilityOptions;
 use Microsoft\Kiota\Abstractions\RequestAdapter;
 use Microsoft\Kiota\Abstractions\RequestInformation;
 use Microsoft\Kiota\Abstractions\RequestOption;
@@ -16,14 +17,28 @@ use Microsoft\Kiota\Abstractions\Serialization\SerializationWriter;
 use Microsoft\Kiota\Abstractions\Serialization\SerializationWriterFactory;
 use Microsoft\Kiota\Abstractions\Types\Date;
 use Microsoft\Kiota\Abstractions\Types\Time;
+use OpenTelemetry\API\Trace\SpanBuilderInterface;
+use OpenTelemetry\API\Trace\SpanInterface;
+use OpenTelemetry\API\Trace\StatusCode;
+use OpenTelemetry\API\Trace\TracerInterface;
+use OpenTelemetry\Context\ScopeInterface;
 use PHPUnit\Framework\TestCase;
 use Microsoft\Kiota\Abstractions\QueryParameter;
 
 class RequestInformationTest extends TestCase {
     private RequestInformation $requestInformation;
+    private ?TracerInterface $originalTracer = null;
 
     protected function setUp(): void {
         $this->requestInformation = new RequestInformation();
+        $this->originalTracer = ObservabilityOptions::getTracer();
+    }
+
+    protected function tearDown(): void {
+        if ($this->originalTracer !== null) {
+            ObservabilityOptions::setTracer($this->originalTracer);
+        }
+        parent::tearDown();
     }
 
     /**
@@ -403,6 +418,31 @@ class RequestInformationTest extends TestCase {
     }
 
     public function testSetContentFromParsableCollection(): void {
+        $span = $this->createMock(SpanInterface::class);
+        $scope = $this->createMock(ScopeInterface::class);
+        $spanBuilder = $this->createMock(SpanBuilderInterface::class);
+        $tracer = $this->createMock(TracerInterface::class);
+
+        $tracer->expects($this->once())
+            ->method('spanBuilder')
+            ->with('setContentFromParsableCollection')
+            ->willReturn($spanBuilder);
+        $spanBuilder->expects($this->once())
+            ->method('startSpan')
+            ->willReturn($span);
+        $span->expects($this->once())
+            ->method('activate')
+            ->willReturn($scope);
+        $span->expects($this->once())
+            ->method('setStatus')
+            ->with(StatusCode::STATUS_OK);
+        $span->expects($this->once())
+            ->method('end');
+        $scope->expects($this->once())
+            ->method('detach');
+
+        ObservabilityOptions::setTracer($tracer);
+
         $requestAdapter = $this->createMock(RequestAdapter::class);
         $serializationWriter = $this->createMock(SerializationWriter::class);
         $writerFactory = $this->createMock(SerializationWriterFactory::class);
@@ -421,6 +461,34 @@ class RequestInformationTest extends TestCase {
     }
 
     public function testSetContentFromParsableCollectionThrowsOnWriterError(): void {
+        $span = $this->createMock(SpanInterface::class);
+        $scope = $this->createMock(ScopeInterface::class);
+        $spanBuilder = $this->createMock(SpanBuilderInterface::class);
+        $tracer = $this->createMock(TracerInterface::class);
+
+        $tracer->expects($this->once())
+            ->method('spanBuilder')
+            ->with('setContentFromParsableCollection')
+            ->willReturn($spanBuilder);
+        $spanBuilder->expects($this->once())
+            ->method('startSpan')
+            ->willReturn($span);
+        $span->expects($this->once())
+            ->method('activate')
+            ->willReturn($scope);
+        $span->expects($this->once())
+            ->method('recordException')
+            ->with($this->isInstanceOf(\RuntimeException::class));
+        $span->expects($this->once())
+            ->method('setStatus')
+            ->with(StatusCode::STATUS_ERROR);
+        $span->expects($this->once())
+            ->method('end');
+        $scope->expects($this->once())
+            ->method('detach');
+
+        ObservabilityOptions::setTracer($tracer);
+
         $requestAdapter = $this->createMock(RequestAdapter::class);
         $writerFactory = $this->createMock(SerializationWriterFactory::class);
         $writerFactory->method('getSerializationWriter')->willThrowException(new Exception('writer failed'));
