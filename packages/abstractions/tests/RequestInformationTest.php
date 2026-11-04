@@ -8,7 +8,12 @@ use Exception;
 use InvalidArgumentException;
 use Microsoft\Kiota\Abstractions\Enum;
 use Microsoft\Kiota\Abstractions\HttpMethod;
+use Microsoft\Kiota\Abstractions\RequestAdapter;
 use Microsoft\Kiota\Abstractions\RequestInformation;
+use Microsoft\Kiota\Abstractions\RequestOption;
+use Microsoft\Kiota\Abstractions\Serialization\Parsable;
+use Microsoft\Kiota\Abstractions\Serialization\SerializationWriter;
+use Microsoft\Kiota\Abstractions\Serialization\SerializationWriterFactory;
 use Microsoft\Kiota\Abstractions\Types\Date;
 use Microsoft\Kiota\Abstractions\Types\Time;
 use PHPUnit\Framework\TestCase;
@@ -376,6 +381,63 @@ class RequestInformationTest extends TestCase {
         $this->assertStringContainsString('filter=equals%28published%2Ctrue%29', $uri);
         $this->assertStringContainsString('sort=-createdAt', $uri);
     }
+
+    public function testGetRequestOptionDirectAndPolymorphic(): void {
+        $requestInfo = new RequestInformation();
+        $option = new TestCustomRequestOption();
+        $requestInfo->addRequestOptions($option);
+
+        $this->assertSame($option, $requestInfo->getRequestOption(TestCustomRequestOption::class));
+        $this->assertSame($option, $requestInfo->getRequestOption(RequestOption::class));
+        $this->assertNull($requestInfo->getRequestOption(TestOtherOption::class));
+    }
+
+    public function testGetUriThrowsOnEmptyBaseUrl(): void {
+        $requestInfo = new RequestInformation();
+        $requestInfo->urlTemplate = '{+baseurl}/users';
+        $requestInfo->pathParameters['baseurl'] = '   ';
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('PathParameters must contain a value for "baseurl" for the url to be built.');
+        $requestInfo->getUri();
+    }
+
+    public function testSetContentFromParsableCollection(): void {
+        $requestAdapter = $this->createMock(RequestAdapter::class);
+        $serializationWriter = $this->createMock(SerializationWriter::class);
+        $writerFactory = $this->createMock(SerializationWriterFactory::class);
+
+        $stream = \GuzzleHttp\Psr7\Utils::streamFor('[{"id": 1}]');
+        $serializationWriter->method('getSerializedContent')->willReturn($stream);
+        $writerFactory->method('getSerializationWriter')->willReturn($serializationWriter);
+        $requestAdapter->method('getSerializationWriterFactory')->willReturn($writerFactory);
+
+        $requestInfo = new RequestInformation();
+        $parsable = new TestParsableModel();
+        $requestInfo->setContentFromParsableCollection($requestAdapter, 'application/json', [$parsable]);
+
+        $this->assertSame($stream, $requestInfo->content);
+        $this->assertEquals(['application/json'], $requestInfo->getHeaders()->get('Content-Type'));
+    }
+
+    public function testSetContentFromParsableCollectionThrowsOnWriterError(): void {
+        $requestAdapter = $this->createMock(RequestAdapter::class);
+        $writerFactory = $this->createMock(SerializationWriterFactory::class);
+        $writerFactory->method('getSerializationWriter')->willThrowException(new Exception('writer failed'));
+        $requestAdapter->method('getSerializationWriterFactory')->willReturn($writerFactory);
+
+        $requestInfo = new RequestInformation();
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('could not serialize payload.');
+        $requestInfo->setContentFromParsableCollection($requestAdapter, 'application/json', []);
+    }
+}
+
+class TestCustomRequestOption implements RequestOption {}
+class TestOtherOption implements RequestOption {}
+class TestParsableModel implements Parsable {
+    public function getFieldDeserializers(): array { return []; }
+    public function serialize(SerializationWriter $writer): void {}
 }
 
 class TestQueryParameter {
