@@ -74,8 +74,8 @@ class RequestInformation {
             && is_string($this->pathParameters[self::$RAW_URL_KEY])) {
             $this->setUri($this->pathParameters[self::$RAW_URL_KEY]);
         } else {
-            if (substr_count(strtolower($this->urlTemplate), '{+baseurl}') > 0 && !isset($this->pathParameters['baseurl'])) {
-                throw new InvalidArgumentException('"PathParameters must contain a value for "baseurl" for the url to be built.');
+            if (substr_count(strtolower($this->urlTemplate), '{+baseurl}') > 0 && (!isset($this->pathParameters['baseurl']) || (is_string($this->pathParameters['baseurl']) && empty(trim($this->pathParameters['baseurl']))))) {
+                throw new InvalidArgumentException('PathParameters must contain a value for "baseurl" for the url to be built.');
             }
 
             foreach ($this->pathParameters as $key => $pathParameter) {
@@ -147,6 +147,27 @@ class RequestInformation {
      */
     public function getRequestOptions(): array {
         return $this->requestOptions;
+    }
+
+    /**
+     * Gets a request option of a specific class or interface type.
+     *
+     * @template T of RequestOption
+     * @param class-string<T> $className
+     * @return T|null
+     */
+    public function getRequestOption(string $className): ?RequestOption {
+        if (array_key_exists($className, $this->requestOptions)) {
+            /** @var T */
+            return $this->requestOptions[$className];
+        }
+        foreach ($this->requestOptions as $option) {
+            if ($option instanceof $className) {
+                /** @var T */
+                return $option;
+            }
+        }
+        return null;
     }
 
     /**
