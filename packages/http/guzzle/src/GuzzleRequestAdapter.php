@@ -419,16 +419,17 @@ class GuzzleRequestAdapter implements RequestAdapter
     }
 
     /**
-     * Set the base URL on the RequestInformation path parameters if not already present or if the adapter has a non-empty base URL.
+     * Set the base URL on the RequestInformation path parameters if not already present.
+     * Request-level path parameters take precedence over the adapter-level base URL.
      *
      * @param RequestInformation $requestInformation
      * @return void
      */
     private function setBaseUrlForRequestInformation(RequestInformation $requestInformation): void
     {
-        $requestInformation->pathParameters['baseurl'] = !empty($this->getBaseUrl())
-            ? $this->getBaseUrl()
-            : ($requestInformation->pathParameters['baseurl'] ?? $this->getBaseUrl());
+        if (empty($requestInformation->pathParameters['baseurl'])) {
+            $requestInformation->pathParameters['baseurl'] = $this->getBaseUrl();
+        }
     }
 
     /**

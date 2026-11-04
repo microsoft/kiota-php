@@ -586,11 +586,8 @@ class GuzzleRequestAdapterTest extends TestCase
 
     public function testConvertToNativePreservesExistingPathParametersBaseUrl(): void
     {
-        $requestAdapter = new GuzzleRequestAdapter(
-            $this->authenticationProvider,
-            $this->parseNodeFactory,
-            $this->createMock(SerializationWriterFactory::class)
-        );
+        $requestAdapter = $this->mockRequestAdapter();
+        $this->assertNotEmpty($requestAdapter->getBaseUrl());
         $requestInfo = new RequestInformation();
         $requestInfo->httpMethod = 'GET';
         $requestInfo->urlTemplate = '{+baseurl}/me';
