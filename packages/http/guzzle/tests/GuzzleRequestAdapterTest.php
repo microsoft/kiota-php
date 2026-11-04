@@ -597,6 +597,32 @@ class GuzzleRequestAdapterTest extends TestCase
         $this->assertEquals('https://custom.endpoint.com/me', strval($request->getUri()));
     }
 
+    public function testGetPsrRequestPreservesExistingPathParametersBaseUrl(): void
+    {
+        $requestAdapter = $this->mockRequestAdapter();
+        $this->assertNotEmpty($requestAdapter->getBaseUrl());
+        $requestInfo = new RequestInformation();
+        $requestInfo->httpMethod = 'GET';
+        $requestInfo->urlTemplate = '{+baseurl}/users';
+        $requestInfo->pathParameters['baseurl'] = 'https://custom.endpoint.com';
+
+        $psrRequest = $requestAdapter->getPsrRequestFromRequestInformation($requestInfo);
+        $this->assertEquals('https://custom.endpoint.com/users', strval($psrRequest->getUri()));
+    }
+
+    public function testConvertToNativeUsesAdapterBaseUrlWhenPathParametersBaseUrlEmpty(): void
+    {
+        $requestAdapter = $this->mockRequestAdapter();
+        $requestInfo = new RequestInformation();
+        $requestInfo->httpMethod = 'GET';
+        $requestInfo->urlTemplate = '{+baseurl}/users';
+        $requestInfo->pathParameters['baseurl'] = '';
+
+        $request = $requestAdapter->convertToNative($requestInfo)->wait();
+        $this->assertInstanceOf(RequestInterface::class, $request);
+        $this->assertEquals($this->baseUrl . '/users', strval($request->getUri()));
+    }
+
     public function testGetPsrRequestSetsServerAddressAttributeToHost(): void
     {
         $requestAdapter = $this->mockRequestAdapter();

@@ -177,4 +177,29 @@ class UserAgentHandlerTest extends TestCase
         $this->assertEquals('kiota-php/2.2.30 kiota-php/2.2.3', $capturedHeaders[0]);
         $this->assertEquals('custom-kiota-php/2.2.3 kiota-php/2.2.3', $capturedHeaders[1]);
     }
+
+    public function testUserAgentDeduplicationHandlesWhitespaceVariations(): void
+    {
+        $option = new UserAgentHandlerOption();
+        $option->setProductName('kiota-php');
+        $option->setProductVersion('2.2.3');
+
+        $capturedHeader = '';
+        $mockHandler = new MockHandler([
+            function (RequestInterface $request) use (&$capturedHeader) {
+                $capturedHeader = $request->getHeaderLine('User-Agent');
+                return new Response(200);
+            }
+        ]);
+
+        $handlerStack = new HandlerStack($mockHandler);
+        $handlerStack->push(KiotaMiddleware::userAgent($option));
+        $client = new Client(['handler' => $handlerStack]);
+
+        $client->get('/', [
+            'headers' => ['User-Agent' => "MyApp/1.0   kiota-php/2.2.3\tOther/2.0"]
+        ]);
+
+        $this->assertEquals("MyApp/1.0   kiota-php/2.2.3\tOther/2.0", $capturedHeader);
+    }
 }
