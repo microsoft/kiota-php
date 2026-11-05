@@ -90,7 +90,9 @@ class TextParseNode implements ParseNode
      */
     public function getIntegerValue(): ?int
     {
-        return (int) filter_var($this->content, FILTER_SANITIZE_NUMBER_INT);
+        $clean = (string) preg_replace('/^\xEF\xBB\xBF/', '', trim($this->content));
+        $val = filter_var($clean, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
+        return $val !== null ? (int) $val : null;
     }
 
     /**
@@ -98,7 +100,9 @@ class TextParseNode implements ParseNode
      */
     public function getFloatValue(): ?float
     {
-        return (float) filter_var($this->content, FILTER_SANITIZE_NUMBER_FLOAT, ['flags' => FILTER_FLAG_ALLOW_FRACTION]);
+        $clean = (string) preg_replace('/^\xEF\xBB\xBF/', '', trim($this->content));
+        $val = filter_var($clean, FILTER_VALIDATE_FLOAT, FILTER_NULL_ON_FAILURE);
+        return $val !== null ? (float) $val : null;
     }
 
     /**
