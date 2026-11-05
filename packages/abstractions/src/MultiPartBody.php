@@ -22,11 +22,15 @@ class MultiPartBody implements Parsable
     private ?RequestAdapter $requestAdapter = null;
 
     /**
+     * @param string|null $boundary
      * @throws Exception
      */
-    public function __construct()
+    public function __construct(?string $boundary = null)
     {
-        $this->boundary = random_bytes(32);
+        if ($boundary !== null && empty(trim($boundary))) {
+            throw new InvalidArgumentException('Boundary cannot be empty.');
+        }
+        $this->boundary = $boundary ?? bin2hex(random_bytes(16));
     }
 
     /**
@@ -137,6 +141,17 @@ class MultiPartBody implements Parsable
             return true;
         }
         return false;
+    }
+
+    /**
+     * @param string $boundary
+     */
+    public function setBoundary(string $boundary): void
+    {
+        if (empty(trim($boundary))) {
+            throw new InvalidArgumentException('Boundary cannot be empty.');
+        }
+        $this->boundary = $boundary;
     }
 
     /**

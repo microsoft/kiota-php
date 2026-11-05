@@ -424,6 +424,17 @@ class RequestInformation {
     }
 
     /**
+     * Removes a specific value from the request headers.
+     * @param string $key
+     * @param string $value
+     * @return bool True if the value was found and removed, false otherwise.
+     */
+    public function removeHeaderValue(string $key, string $value): bool
+    {
+        return $this->headers->removeValue($key, $value);
+    }
+
+    /**
      * Add value to header with specific key.
      * @param string $key
      * @param string $value
