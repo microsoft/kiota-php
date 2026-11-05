@@ -54,7 +54,7 @@ class TextParseNode implements ParseNode
      */
     public function __construct(string $content)
     {
-        if (!$content) {
+        if ($content === '') {
             throw new \InvalidArgumentException('Content should be a non-empty string');
         }
         $this->content = $content;
