@@ -221,7 +221,9 @@ class RequestInformation {
             $writer = $requestAdapter->getSerializationWriterFactory()->getSerializationWriter($contentType);
 
             if (is_a($value, MultiPartBody::class)) {
-                $contentType = "$contentType; boundary={$value->getBoundary()}";
+                $boundary = $value->getBoundary();
+                $formattedBoundary = preg_match('/^[a-zA-Z0-9\'!#$%&*+\-.^_`|~]+$/', $boundary) ? $boundary : "\"$boundary\"";
+                $contentType = "$contentType; boundary=$formattedBoundary";
                 $value->setRequestAdapter($requestAdapter);
             }
 

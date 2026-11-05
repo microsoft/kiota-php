@@ -27,8 +27,8 @@ class MultiPartBody implements Parsable
      */
     public function __construct(?string $boundary = null)
     {
-        if ($boundary !== null && empty(trim($boundary))) {
-            throw new InvalidArgumentException('Boundary cannot be empty.');
+        if ($boundary !== null) {
+            $this->validateBoundary($boundary);
         }
         $this->boundary = $boundary ?? bin2hex(random_bytes(16));
     }
@@ -148,10 +148,22 @@ class MultiPartBody implements Parsable
      */
     public function setBoundary(string $boundary): void
     {
-        if (empty(trim($boundary))) {
+        $this->validateBoundary($boundary);
+        $this->boundary = $boundary;
+    }
+
+    /**
+     * @param string $boundary
+     * @throws InvalidArgumentException
+     */
+    private function validateBoundary(string $boundary): void
+    {
+        if (trim($boundary) === '') {
             throw new InvalidArgumentException('Boundary cannot be empty.');
         }
-        $this->boundary = $boundary;
+        if (!preg_match('/^[a-zA-Z0-9\'()+_,\-.\/:=?]{1,70}$/', $boundary)) {
+            throw new InvalidArgumentException('Boundary contains invalid characters or exceeds 70 characters.');
+        }
     }
 
     /**
