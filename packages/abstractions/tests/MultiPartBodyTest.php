@@ -2,6 +2,7 @@
 
 namespace Microsoft\Kiota\Abstractions\Tests;
 
+use InvalidArgumentException;
 use Microsoft\Kiota\Abstractions\MultiPartBody;
 use PHPUnit\Framework\TestCase;
 
@@ -39,5 +40,43 @@ class MultiPartBodyTest extends TestCase
     {
         $mpBody = new MultiPartBody();
         $this->assertEmpty($mpBody->getFieldDeserializers());
+    }
+
+    public function testDefaultBoundaryIsPrintableAndValidHex(): void
+    {
+        $mpBody = new MultiPartBody();
+        $boundary = $mpBody->getBoundary();
+
+        $this->assertNotEmpty($boundary);
+        $this->assertEquals(32, strlen($boundary));
+        $this->assertTrue(ctype_xdigit($boundary));
+        $this->assertTrue(ctype_print($boundary));
+        $this->assertMatchesRegularExpression('/^[a-zA-Z0-9\'()+_,-.\/:=?]+$/', $boundary);
+    }
+
+    public function testCustomBoundaryViaConstructor(): void
+    {
+        $mpBody = new MultiPartBody('custom-boundary-123');
+        $this->assertEquals('custom-boundary-123', $mpBody->getBoundary());
+    }
+
+    public function testConstructorThrowsOnEmptyBoundary(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        new MultiPartBody('   ');
+    }
+
+    public function testSetBoundary(): void
+    {
+        $mpBody = new MultiPartBody();
+        $mpBody->setBoundary('custom-updated-boundary');
+        $this->assertEquals('custom-updated-boundary', $mpBody->getBoundary());
+    }
+
+    public function testSetBoundaryThrowsOnEmptyBoundary(): void
+    {
+        $mpBody = new MultiPartBody();
+        $this->expectException(InvalidArgumentException::class);
+        $mpBody->setBoundary('');
     }
 }
