@@ -25,6 +25,12 @@ class TextParseNodeTest extends TestCase
         $parseNode = new TextParseNode('');
     }
 
+    function testConstructorAllowsZeroString()
+    {
+        $parseNode = new TextParseNode('0');
+        $this->assertEquals('0', $parseNode->getStringValue());
+    }
+
     /**
      * @dataProvider invalidMethodNamesProvider
      */
@@ -48,10 +54,14 @@ class TextParseNodeTest extends TestCase
     {
         $this->assertEquals('content', (new TextParseNode('content'))->getStringValue());
         $this->assertFalse((new TextParseNode('false'))->getBooleanValue());
-        $number = utf8_decode('ï»¿123'); // some graph $count endpoints return extra Unicode chars
+        $number = "\xEF\xBB\xBF123"; // some graph $count endpoints return extra Unicode chars
         $this->assertEquals(123, (new TextParseNode($number))->getIntegerValue());
         $this->assertEquals(123, (new TextParseNode('123'))->getIntegerValue());
+        $this->assertEquals(0, (new TextParseNode('0'))->getIntegerValue());
         $this->assertEquals(1.23, (new TextParseNode('1.23'))->getFloatValue());
+        $this->assertEquals(0.0, (new TextParseNode('0.0'))->getFloatValue());
+        $this->assertNull((new TextParseNode('not-a-number'))->getIntegerValue());
+        $this->assertNull((new TextParseNode('not-a-number'))->getFloatValue());
         $this->assertInstanceOf(\DateTime::class, (new TextParseNode('2022-05-05 13:56'))->getDateTimeValue());
         $this->assertInstanceOf(\DateInterval::class, (new TextParseNode('P1DT0H0M0S'))->getDateIntervalValue());
         $this->assertInstanceOf(Date::class, (new TextParseNode('2022-05-05'))->getDateValue());
