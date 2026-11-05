@@ -330,6 +330,42 @@ class RequestInformationTest extends TestCase {
         $this->assertTrue(ctype_xdigit($multipart->getBoundary()));
     }
 
+    public function testSetContentFromParsableWithBoundaryZero(): void {
+        $requestAdapter = $this->createMock(RequestAdapter::class);
+        $serializationWriter = $this->createMock(SerializationWriter::class);
+        $writerFactory = $this->createMock(SerializationWriterFactory::class);
+
+        $stream = \GuzzleHttp\Psr7\Utils::streamFor('--0--');
+        $serializationWriter->method('getSerializedContent')->willReturn($stream);
+        $writerFactory->method('getSerializationWriter')->willReturn($serializationWriter);
+        $requestAdapter->method('getSerializationWriterFactory')->willReturn($writerFactory);
+
+        $requestInfo = new RequestInformation();
+        $multipart = new MultiPartBody('0');
+        $requestInfo->setContentFromParsable($requestAdapter, 'multipart/form-data', $multipart);
+
+        $contentTypeHeaders = $requestInfo->getHeaders()->get('Content-Type');
+        $this->assertEquals(['multipart/form-data; boundary=0'], $contentTypeHeaders);
+    }
+
+    public function testSetContentFromParsableQuotesNonTokenBoundary(): void {
+        $requestAdapter = $this->createMock(RequestAdapter::class);
+        $serializationWriter = $this->createMock(SerializationWriter::class);
+        $writerFactory = $this->createMock(SerializationWriterFactory::class);
+
+        $stream = \GuzzleHttp\Psr7\Utils::streamFor('--custom:boundary=1--');
+        $serializationWriter->method('getSerializedContent')->willReturn($stream);
+        $writerFactory->method('getSerializationWriter')->willReturn($serializationWriter);
+        $requestAdapter->method('getSerializationWriterFactory')->willReturn($writerFactory);
+
+        $requestInfo = new RequestInformation();
+        $multipart = new MultiPartBody('custom:boundary=1');
+        $requestInfo->setContentFromParsable($requestAdapter, 'multipart/form-data', $multipart);
+
+        $contentTypeHeaders = $requestInfo->getHeaders()->get('Content-Type');
+        $this->assertEquals(['multipart/form-data; boundary="custom:boundary=1"'], $contentTypeHeaders);
+    }
+
     /**
      * @throws InvalidArgumentException
      */
