@@ -34,19 +34,19 @@ class TextSerializationWriterTest extends TestCase
     function testWriteStringValueWithZeroString()
     {
         $this->serializationWriter->writeStringValue(null, '0');
-        $this->assertEquals('0', $this->serializationWriter->getSerializedContent()->getContents());
+        $this->assertSame('0', $this->serializationWriter->getSerializedContent()->getContents());
     }
 
     function testWriteIntegerValueWithZero()
     {
         $this->serializationWriter->writeIntegerValue(null, 0);
-        $this->assertEquals('0', $this->serializationWriter->getSerializedContent()->getContents());
+        $this->assertSame('0', $this->serializationWriter->getSerializedContent()->getContents());
     }
 
     function testWriteFloatValueWithZero()
     {
         $this->serializationWriter->writeFloatValue(null, 0.0);
-        $this->assertEquals('0', $this->serializationWriter->getSerializedContent()->getContents());
+        $this->assertSame('0', $this->serializationWriter->getSerializedContent()->getContents());
     }
 
     function testWriteWithKeyThrowsException()

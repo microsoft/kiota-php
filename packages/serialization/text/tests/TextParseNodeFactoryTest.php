@@ -30,6 +30,6 @@ class TextParseNodeFactoryTest extends TestCase
     function testGetRootParseNodeWithZeroResponseStream()
     {
         $node = $this->parseNodeFactory->getRootParseNode('text/plain', Utils::streamFor('0'));
-        $this->assertEquals('0', $node->getStringValue());
+        $this->assertSame('0', $node->getStringValue());
     }
 }
