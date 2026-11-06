@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.2.4](https://github.com/microsoft/kiota-php/compare/microsoft-kiota-serialization-multipart-v2.2.3...microsoft-kiota-serialization-multipart-v2.2.4) (2026-11-06)
+
+
+### Miscellaneous Chores
+
+* **microsoft-kiota-serialization-multipart:** Synchronize microsoft-kiota-php versions
+
 ## [2.2.3](https://github.com/microsoft/kiota-php/compare/microsoft-kiota-serialization-multipart-v2.2.2...microsoft-kiota-serialization-multipart-v2.2.3) (2026-11-03)
 
 
