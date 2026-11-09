@@ -81,9 +81,7 @@ class TextSerializationWriter implements SerializationWriter
      */
     public function writeBooleanValue(?string $key, ?bool $value): void
     {
-        if ($value !== null) {
-            $this->writeStringValue($key, $value ? 'true' : 'false');
-        }
+        $this->writeStringValue($key, $value !== null ? ($value ? 'true' : 'false') : null);
     }
 
     /**
@@ -91,9 +89,7 @@ class TextSerializationWriter implements SerializationWriter
      */
     public function writeFloatValue(?string $key, ?float $value): void
     {
-        if ($value !== null) {
-            $this->writeStringValue($key, (string) $value);
-        }
+        $this->writeStringValue($key, $value !== null ? (string) $value : null);
     }
 
     /**
@@ -101,9 +97,7 @@ class TextSerializationWriter implements SerializationWriter
      */
     public function writeIntegerValue(?string $key, ?int $value): void
     {
-        if ($value !== null) {
-            $this->writeStringValue($key, (string) $value);
-        }
+        $this->writeStringValue($key, $value !== null ? (string) $value : null);
     }
 
     /**
@@ -111,9 +105,7 @@ class TextSerializationWriter implements SerializationWriter
      */
     public function writeDateTimeValue(?string $key, ?DateTime $value): void
     {
-        if ($value) {
-            $this->writeStringValue($key, $this->getDateTimeValueAsString($value));
-        }
+        $this->writeStringValue($key, $value !== null ? $this->getDateTimeValueAsString($value) : null);
     }
 
     /**
@@ -180,9 +172,7 @@ class TextSerializationWriter implements SerializationWriter
      */
     public function writeDateValue(?string $key, ?Date $value): void
     {
-        if ($value !== null) {
-            $this->writeStringValue($key, (string) $value);
-        }
+        $this->writeStringValue($key, $value !== null ? (string) $value : null);
     }
 
     /**
@@ -190,9 +180,7 @@ class TextSerializationWriter implements SerializationWriter
      */
     public function writeTimeValue(?string $key, ?Time $value): void
     {
-        if ($value !== null) {
-            $this->writeStringValue($key, (string) $value);
-        }
+        $this->writeStringValue($key, $value !== null ? (string) $value : null);
     }
 
     /**
@@ -200,9 +188,7 @@ class TextSerializationWriter implements SerializationWriter
      */
     public function writeDateIntervalValue(?string $key, ?DateInterval $value): void
     {
-        if ($value !== null){
-            $this->writeStringValue($key, $this->getDateIntervalValueAsString($value));
-        }
+        $this->writeStringValue($key, $value !== null ? $this->getDateIntervalValueAsString($value) : null);
     }
 
     /**

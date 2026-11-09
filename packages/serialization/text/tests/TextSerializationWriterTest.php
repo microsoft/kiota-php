@@ -31,6 +31,30 @@ class TextSerializationWriterTest extends TestCase
         $this->assertEmpty($this->serializationWriter->getSerializedContent()->getContents());
     }
 
+    /**
+     * @dataProvider nullScalarMethodsDataProvider
+     */
+    function testNullScalarValuesWriteEmptyString(string $methodName)
+    {
+        $writer = new TextSerializationWriter();
+        call_user_func([$writer, $methodName], null, null);
+        $this->assertSame('', $writer->getSerializedContent()->getContents());
+    }
+
+    public function nullScalarMethodsDataProvider(): array
+    {
+        return [
+            ['writeStringValue'],
+            ['writeBooleanValue'],
+            ['writeIntegerValue'],
+            ['writeFloatValue'],
+            ['writeDateTimeValue'],
+            ['writeDateValue'],
+            ['writeTimeValue'],
+            ['writeDateIntervalValue'],
+        ];
+    }
+
     function testWriteStringValueWithZeroString()
     {
         $this->serializationWriter->writeStringValue(null, '0');

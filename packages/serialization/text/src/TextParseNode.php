@@ -86,12 +86,19 @@ class TextParseNode implements ParseNode
     }
 
     /**
+     * Strips UTF-8 BOM and leading/trailing whitespace from content.
+     */
+    private function getCleanContent(): string
+    {
+        return (string) preg_replace('/^\xEF\xBB\xBF/', '', trim($this->content));
+    }
+
+    /**
      * @inheritDoc
      */
     public function getIntegerValue(): ?int
     {
-        $clean = (string) preg_replace('/^\xEF\xBB\xBF/', '', trim($this->content));
-        $val = filter_var($clean, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
+        $val = filter_var($this->getCleanContent(), FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
         return $val !== null ? (int) $val : null;
     }
 
@@ -100,8 +107,7 @@ class TextParseNode implements ParseNode
      */
     public function getFloatValue(): ?float
     {
-        $clean = (string) preg_replace('/^\xEF\xBB\xBF/', '', trim($this->content));
-        $val = filter_var($clean, FILTER_VALIDATE_FLOAT, FILTER_NULL_ON_FAILURE);
+        $val = filter_var($this->getCleanContent(), FILTER_VALIDATE_FLOAT, FILTER_NULL_ON_FAILURE);
         return $val !== null ? (float) $val : null;
     }
 
