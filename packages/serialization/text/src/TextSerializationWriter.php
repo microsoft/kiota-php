@@ -67,13 +67,13 @@ class TextSerializationWriter implements SerializationWriter
      */
     public function writeStringValue(?string $key, ?string $value): void
     {
-        if ($key) {
+        if ($key !== null && $key !== '') {
             throw new InvalidArgumentException('Keys not supported for text/plain content type');
         }
         if ($this->stream->getSize()) {
             throw new RuntimeException('A value was already written for this serialization writer. Text content only allows a single value');
         }
-        (!$value) ? $this->stream->write('') : $this->stream->write($value);
+        $this->stream->write($value ?? '');
     }
 
     /**
@@ -81,7 +81,7 @@ class TextSerializationWriter implements SerializationWriter
      */
     public function writeBooleanValue(?string $key, ?bool $value): void
     {
-        ($value) ? $this->writeStringValue($key, 'true') : $this->writeStringValue($key, 'false');
+        $this->writeStringValue($key, $value !== null ? ($value ? 'true' : 'false') : null);
     }
 
     /**
@@ -89,7 +89,7 @@ class TextSerializationWriter implements SerializationWriter
      */
     public function writeFloatValue(?string $key, ?float $value): void
     {
-        $this->writeStringValue($key, (string) $value);
+        $this->writeStringValue($key, $value !== null ? (string) $value : null);
     }
 
     /**
@@ -97,7 +97,7 @@ class TextSerializationWriter implements SerializationWriter
      */
     public function writeIntegerValue(?string $key, ?int $value): void
     {
-        $this->writeStringValue($key, (string) $value);
+        $this->writeStringValue($key, $value !== null ? (string) $value : null);
     }
 
     /**
@@ -105,9 +105,7 @@ class TextSerializationWriter implements SerializationWriter
      */
     public function writeDateTimeValue(?string $key, ?DateTime $value): void
     {
-        if ($value) {
-            $this->writeStringValue($key, $this->getDateTimeValueAsString($value));
-        }
+        $this->writeStringValue($key, $value !== null ? $this->getDateTimeValueAsString($value) : null);
     }
 
     /**
@@ -174,7 +172,7 @@ class TextSerializationWriter implements SerializationWriter
      */
     public function writeDateValue(?string $key, ?Date $value): void
     {
-        $this->writeStringValue($key, (string) $value);
+        $this->writeStringValue($key, $value !== null ? (string) $value : null);
     }
 
     /**
@@ -182,7 +180,7 @@ class TextSerializationWriter implements SerializationWriter
      */
     public function writeTimeValue(?string $key, ?Time $value): void
     {
-        $this->writeStringValue($key, (string) $value);
+        $this->writeStringValue($key, $value !== null ? (string) $value : null);
     }
 
     /**
@@ -190,9 +188,7 @@ class TextSerializationWriter implements SerializationWriter
      */
     public function writeDateIntervalValue(?string $key, ?DateInterval $value): void
     {
-        if ($value !== null){
-            $this->writeStringValue($key, $this->getDateIntervalValueAsString($value));
-        }
+        $this->writeStringValue($key, $value !== null ? $this->getDateIntervalValueAsString($value) : null);
     }
 
     /**

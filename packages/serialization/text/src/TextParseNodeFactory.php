@@ -25,7 +25,7 @@ class TextParseNodeFactory implements ParseNodeFactory
             throw new \InvalidArgumentException("Expected content type to be {$this->getValidContentType()}");
         }
         $responseContent = $rawResponse->getContents();
-        if (!$responseContent) {
+        if ($responseContent === '') {
             throw new \RuntimeException('Expected a non-empty response stream');
         }
         return new TextParseNode($responseContent);

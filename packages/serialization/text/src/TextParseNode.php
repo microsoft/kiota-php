@@ -54,7 +54,7 @@ class TextParseNode implements ParseNode
      */
     public function __construct(string $content)
     {
-        if (!$content) {
+        if ($content === '') {
             throw new \InvalidArgumentException('Content should be a non-empty string');
         }
         $this->content = $content;
@@ -86,11 +86,20 @@ class TextParseNode implements ParseNode
     }
 
     /**
+     * Strips UTF-8 BOM and leading/trailing whitespace from content.
+     */
+    private function getCleanContent(): string
+    {
+        return (string) preg_replace('/^\xEF\xBB\xBF/', '', trim($this->content));
+    }
+
+    /**
      * @inheritDoc
      */
     public function getIntegerValue(): ?int
     {
-        return (int) filter_var($this->content, FILTER_SANITIZE_NUMBER_INT);
+        $val = filter_var($this->getCleanContent(), FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
+        return $val !== null ? (int) $val : null;
     }
 
     /**
@@ -98,7 +107,8 @@ class TextParseNode implements ParseNode
      */
     public function getFloatValue(): ?float
     {
-        return (float) filter_var($this->content, FILTER_SANITIZE_NUMBER_FLOAT, ['flags' => FILTER_FLAG_ALLOW_FRACTION]);
+        $val = filter_var($this->getCleanContent(), FILTER_VALIDATE_FLOAT, FILTER_NULL_ON_FAILURE);
+        return $val !== null ? (float) $val : null;
     }
 
     /**

@@ -31,6 +31,48 @@ class TextSerializationWriterTest extends TestCase
         $this->assertEmpty($this->serializationWriter->getSerializedContent()->getContents());
     }
 
+    /**
+     * @dataProvider nullScalarMethodsDataProvider
+     */
+    function testNullScalarValuesWriteEmptyString(string $methodName)
+    {
+        $writer = new TextSerializationWriter();
+        call_user_func([$writer, $methodName], null, null);
+        $this->assertSame('', $writer->getSerializedContent()->getContents());
+    }
+
+    public function nullScalarMethodsDataProvider(): array
+    {
+        return [
+            ['writeStringValue'],
+            ['writeBooleanValue'],
+            ['writeIntegerValue'],
+            ['writeFloatValue'],
+            ['writeDateTimeValue'],
+            ['writeDateValue'],
+            ['writeTimeValue'],
+            ['writeDateIntervalValue'],
+        ];
+    }
+
+    function testWriteStringValueWithZeroString()
+    {
+        $this->serializationWriter->writeStringValue(null, '0');
+        $this->assertSame('0', $this->serializationWriter->getSerializedContent()->getContents());
+    }
+
+    function testWriteIntegerValueWithZero()
+    {
+        $this->serializationWriter->writeIntegerValue(null, 0);
+        $this->assertSame('0', $this->serializationWriter->getSerializedContent()->getContents());
+    }
+
+    function testWriteFloatValueWithZero()
+    {
+        $this->serializationWriter->writeFloatValue(null, 0.0);
+        $this->assertSame('0', $this->serializationWriter->getSerializedContent()->getContents());
+    }
+
     function testWriteWithKeyThrowsException()
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -51,6 +93,7 @@ class TextSerializationWriterTest extends TestCase
         $negInterval = new DateInterval('P1DT10M12S');
         $negInterval->invert = 1;
         return [
+            ['writeStringValue', '0', '0'],
             ['writeBooleanValue', false, 'false'],
             ['writeFloatValue', 1.23, '1.23'],
             ['writeIntegerValue', 123, '123'],
