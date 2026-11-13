@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.3.0](https://github.com/microsoft/kiota-php/compare/microsoft-kiota-serialization-text-v2.2.3...microsoft-kiota-serialization-text-v2.3.0) (2026-11-13)
+
+
+### Bug Fixes
+
+* **serialization-text:** allow zero string content in TextParseNode and TextParseNodeFactory ([0fad5fb](https://github.com/microsoft/kiota-php/commit/0fad5fb718f32d6c0a4892f86f0b3eac7974f8be))
+* **serialization-text:** preserve zero string and numeric values in TextSerializationWriter ([097cfcd](https://github.com/microsoft/kiota-php/commit/097cfcd204b000e711b7006b576ebbeda27ab1cd))
+* **serialization-text:** validate integer and float parsing in TextParseNode ([fb831c6](https://github.com/microsoft/kiota-php/commit/fb831c62e20be916c6615245c58a7445a6b5eda0))
+* **serialization:** handle zero values and preserve delimiters in form and text serialization ([d7ec55c](https://github.com/microsoft/kiota-php/commit/d7ec55c3bae22b55723235e2b4836304d46e7023))
+* **serialization:** standardize null scalar serialization, deduplicate bom parsing, and strict count ([1480d6b](https://github.com/microsoft/kiota-php/commit/1480d6bc6306aed543840afb4015ddbdc355f30f))
+
 ## [2.2.3](https://github.com/microsoft/kiota-php/compare/microsoft-kiota-serialization-text-v2.2.2...microsoft-kiota-serialization-text-v2.2.3) (2026-11-03)
 
 
