@@ -14,6 +14,7 @@ updates:
   - /
   - /packages/abstractions
   - /packages/authentication/phpleague
+  - /packages/bundle
   - /packages/http/guzzle
   - /packages/serialization/form
   - /packages/serialization/json
