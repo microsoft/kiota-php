@@ -55,9 +55,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          # Disabling shallow clones is recommended for improving the relevancy of reporting
-          fetch-depth: 0
       - name: Setup PHP and Xdebug for Code Coverage report
         uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
         with:
@@ -69,14 +66,6 @@ jobs:
         run: composer install
       - name: Run tests with coverage
         run: ./vendor/bin/phpunit --coverage-clover=coverage.xml
-      - name: Fix code coverage paths
-        run: |
-          sed -i 's@'$GITHUB_WORKSPACE'@/github/workspace/@g' coverage.xml
-      - name: SonarCloud Scan
-        if: ${{ !github.event.pull_request.head.repo.fork }}
-        uses: SonarSource/sonarqube-scan-action@e805d875275f728fac1885b413934be6d7c63f65 # v8.4.1
-        env:
-            SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
   # The check-php-version-matrix returns success if all matrix jobs in build are successful; otherwise, it returns a failure.
   # Use this as a PR status check for GitHub Policy Service instead of individual matrix entry checks.
