@@ -1,6 +1,5 @@
 # Kiota Text Serialization Library for PHP
 ![Build](https://github.com/microsoft/kiota-serialization-text-php/actions/workflows/pr-validation.yml/badge.svg)
-[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=microsoft_kiota-serialization-text-php&metric=coverage)](https://sonarcloud.io/dashboard?id=microsoft_kiota-serialization-text-php)
 
 Provides a serialization library implementation that handles serialization/deserialization to/from `text/plain` content
 types for [Kiota](https://github.com/microsoft/kiota) generated projects.

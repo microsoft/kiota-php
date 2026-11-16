@@ -2,7 +2,6 @@
 
 ![Build Status](https://github.com/microsoft/kiota-serialization-multipart-php/actions/workflows/pr-validation.yml/badge.svg)
 [![Latest Stable Version](https://poser.pugx.org/microsoft/kiota-serialization-multipart/version)](https://packagist.org/packages/microsoft/kiota-serialization-json)
-[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=microsoft_kiota-serialization-multipart-php&metric=coverage)](https://sonarcloud.io/dashboard?id=microsoft_kiota-serialization-multipart-php)
 
 The Multipart Serialization Library for PHP is the PHP Multipart serialization library implementation.
 
