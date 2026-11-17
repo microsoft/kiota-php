@@ -335,15 +335,36 @@ class RetryHandler
             return max(0, $seconds);
         }
         $gmt = new DateTimeZone('GMT');
-        $retryAfterDateTime = DateTime::createFromFormat(DateTimeInterface::RFC7231, $trimmed, $gmt)
-            ?: DateTime::createFromFormat('l, d-M-y H:i:s \G\M\T', $trimmed, $gmt)
-            ?: DateTime::createFromFormat('D M j H:i:s Y', $trimmed, $gmt)
-            ?: DateTime::createFromFormat('D M  j H:i:s Y', $trimmed, $gmt);
+        $retryAfterDateTime = $this->createDateTimeFromFormat(DateTimeInterface::RFC7231, $trimmed, $gmt)
+            ?? $this->createDateTimeFromFormat('l, d-M-y H:i:s \G\M\T', $trimmed, $gmt)
+            ?? $this->createDateTimeFromFormat('D M j H:i:s Y', $trimmed, $gmt)
+            ?? $this->createDateTimeFromFormat('D M  j H:i:s Y', $trimmed, $gmt);
 
         if (!$retryAfterDateTime) {
             return 0;
         }
         return max(0, $retryAfterDateTime->getTimestamp() - (new DateTime('now', $gmt))->getTimestamp());
+    }
+
+    /**
+     * Creates a DateTime from format ensuring no parsing errors or calendar overflow warnings occurred.
+     *
+     * @param string $format
+     * @param string $dateString
+     * @param DateTimeZone $timezone
+     * @return DateTime|null
+     */
+    private function createDateTimeFromFormat(string $format, string $dateString, DateTimeZone $timezone): ?DateTime
+    {
+        $dateTime = DateTime::createFromFormat($format, $dateString, $timezone);
+        if ($dateTime === false) {
+            return null;
+        }
+        $errors = DateTime::getLastErrors();
+        if ($errors !== false && ($errors['warning_count'] > 0 || $errors['error_count'] > 0)) {
+            return null;
+        }
+        return $dateTime;
     }
 
     /**

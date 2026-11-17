@@ -220,6 +220,39 @@ class RetryHandlerTest extends TestCase
         $this->assertEquals(200, $response->getStatusCode());
     }
 
+    public function testRetryHandlerRejectsInvalidCalendarDates(): void
+    {
+        $ref = new \ReflectionClass(RetryHandler::class);
+        $method = $ref->getMethod('parseRetryAfterToSeconds');
+        $method->setAccessible(true);
+        $handler = new RetryHandler(fn() => \GuzzleHttp\Promise\Create::promiseFor(new Response(200)));
+
+        $invalidCalendarDates = [
+            'Tue Nov 31 12:00:00 2026', // November has 30 days
+            'Sun, 31 Nov 2026 12:00:00 GMT',
+            'Tuesday, 31-Nov-26 12:00:00 GMT',
+            'Sun, 29 Feb 2025 12:00:00 GMT', // 2025 is not a leap year
+            'Fri Feb 29 12:00:00 2025',
+        ];
+        foreach ($invalidCalendarDates as $date) {
+            $seconds = $method->invoke($handler, $date);
+            $this->assertSame(0, $seconds, "Invalid calendar date '$date' must be rejected and return 0");
+        }
+
+        // Test that request with an invalid calendar date falls back to configured exponential delay instead of a future sleep
+        $mockResponses = [
+            new Response(429, ['Retry-After' => 'Tue Nov 31 12:00:00 2026']),
+            function (RequestInterface $request, array $options) {
+                if (array_key_exists('delay', $options) && $options['delay'] === $this->testRetryOption->getDelay() * 1000) {
+                    return new Response(200);
+                }
+                return new \RuntimeException("Expected fallback delay to be set rather than invalid calendar date delay");
+            }
+        ];
+        $response = $this->executeMockRequestWithRetryHandler($mockResponses, $this->testRetryOption);
+        $this->assertEquals(200, $response->getStatusCode());
+    }
+
     public function testRetryHandlerParsesHttpDatesInNonUtcTimezones(): void
     {
         $originalTz = date_default_timezone_get();
