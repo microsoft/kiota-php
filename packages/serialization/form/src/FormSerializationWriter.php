@@ -66,7 +66,7 @@ class FormSerializationWriter implements SerializationWriter
     public function writeStringValue(?string $key, ?string $value): void
     {
         if ($value !== null) {
-            if (!empty($key)) {
+            if ($key !== null && $key !== '') {
                 $this->writePropertyName($key);
             }
             $urlEncodedString = urlencode($this->getStringValueAsEscapedString($value));
@@ -80,7 +80,7 @@ class FormSerializationWriter implements SerializationWriter
     public function writeBooleanValue(?string $key, ?bool $value): void
     {
         if ($value !== null) {
-            if (!empty($key)) {
+            if ($key !== null && $key !== '') {
                 $this->writePropertyName($key);
             }
             $options = ['false', 'true'];
@@ -94,7 +94,7 @@ class FormSerializationWriter implements SerializationWriter
     public function writeFloatValue(?string $key, ?float $value): void
     {
         if ($value !== null) {
-            if (!empty($key)) {
+            if ($key !== null && $key !== '') {
                 $this->writePropertyName($key);
             }
             $this->writePropertyValue($key, $value);
@@ -107,7 +107,7 @@ class FormSerializationWriter implements SerializationWriter
     public function writeIntegerValue(?string $key, ?int $value): void
     {
         if ($value !== null) {
-            if (!empty($key)) {
+            if ($key !== null && $key !== '') {
                 $this->writePropertyName($key);
             }
             $this->writePropertyValue($key, $value);
@@ -120,7 +120,7 @@ class FormSerializationWriter implements SerializationWriter
     public function writeDateTimeValue(?string $key, ?DateTime $value): void
     {
         if ($value !== null) {
-            if (!empty($key)) {
+            if ($key !== null && $key !== '') {
                 $this->writePropertyName($key);
             }
             $this->writePropertyValue($key, $this->getDateTimeValueAsString($value));
@@ -194,7 +194,7 @@ class FormSerializationWriter implements SerializationWriter
     public function writeEnumValue(?string $key, ?Enum $value): void
     {
         if ($value !== null) {
-            if (!empty($key)) {
+            if ($key !== null && $key !== '') {
                 $this->writePropertyName($key);
             }
             $this->writePropertyValue($key, "{$value->value()}");
@@ -246,7 +246,7 @@ class FormSerializationWriter implements SerializationWriter
     public function writeDateValue(?string $key, ?Date $value): void
     {
         if ($value !== null) {
-            if (!empty($key)) {
+            if ($key !== null && $key !== '') {
                 $this->writePropertyName($key);
             }
             $val = "$value";
@@ -260,7 +260,7 @@ class FormSerializationWriter implements SerializationWriter
     public function writeTimeValue(?string $key, ?Time $value): void
     {
         if ($value !== null) {
-            if (!empty($key)) {
+            if ($key !== null && $key !== '') {
                 $this->writePropertyName($key);
             }
             $val = "$value";
@@ -274,7 +274,7 @@ class FormSerializationWriter implements SerializationWriter
     public function writeDateIntervalValue(?string $key, ?DateInterval $value): void
     {
         if ($value !== null){
-            if (!empty($key)) {
+            if ($key !== null && $key !== '') {
                 $this->writePropertyName($key);
             }
             $this->writePropertyValue($key, $this->getDateIntervalValueAsString($value));
@@ -365,7 +365,7 @@ class FormSerializationWriter implements SerializationWriter
         if ($value !== null) {
             $value = (array)$value;
 
-            if(!empty($key)) {
+            if ($key !== null && $key !== '') {
                 if (count($value) > 0) {
                     throw new RuntimeException('Form Serialization does not support nesting.');
                 }
