@@ -10,6 +10,7 @@ namespace Microsoft\Kiota\Http\Middleware;
 
 use DateTime;
 use DateTimeInterface;
+use DateTimeZone;
 use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Promise\Create;
 use GuzzleHttp\Promise\PromiseInterface;
@@ -333,22 +334,16 @@ class RetryHandler
             $seconds = intval($trimmed);
             return max(0, $seconds);
         }
-        $retryAfterDateTime = DateTime::createFromFormat(DateTimeInterface::RFC7231, $trimmed);
-        if (!$retryAfterDateTime) {
-            $retryAfterDateTime = DateTime::createFromFormat('l, d-M-y H:i:s \G\M\T', $trimmed)
-                ?: DateTime::createFromFormat('D M j H:i:s Y', $trimmed)
-                ?: DateTime::createFromFormat('D M  j H:i:s Y', $trimmed);
-        }
-        if (!$retryAfterDateTime) {
-            $timestamp = strtotime($trimmed);
-            if ($timestamp !== false) {
-                $retryAfterDateTime = (new DateTime())->setTimestamp($timestamp);
-            }
-        }
+        $gmt = new DateTimeZone('GMT');
+        $retryAfterDateTime = DateTime::createFromFormat(DateTimeInterface::RFC7231, $trimmed, $gmt)
+            ?: DateTime::createFromFormat('l, d-M-y H:i:s \G\M\T', $trimmed, $gmt)
+            ?: DateTime::createFromFormat('D M j H:i:s Y', $trimmed, $gmt)
+            ?: DateTime::createFromFormat('D M  j H:i:s Y', $trimmed, $gmt);
+
         if (!$retryAfterDateTime) {
             return 0;
         }
-        return max(0, $retryAfterDateTime->getTimestamp() - (new DateTime())->getTimestamp());
+        return max(0, $retryAfterDateTime->getTimestamp() - (new DateTime('now', $gmt))->getTimestamp());
     }
 
     /**

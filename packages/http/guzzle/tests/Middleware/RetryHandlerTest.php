@@ -193,6 +193,68 @@ class RetryHandlerTest extends TestCase
         $this->assertEquals(200, $response->getStatusCode());
     }
 
+    public function testRetryHandlerRejectsRelativeDateExpressions(): void
+    {
+        $ref = new \ReflectionClass(RetryHandler::class);
+        $method = $ref->getMethod('parseRetryAfterToSeconds');
+        $method->setAccessible(true);
+        $handler = new RetryHandler(fn() => \GuzzleHttp\Promise\Create::promiseFor(new Response(200)));
+
+        $relativeExpressions = ['+1 hour', '+120 seconds', 'next Monday', 'now', 'tomorrow'];
+        foreach ($relativeExpressions as $expr) {
+            $seconds = $method->invoke($handler, $expr);
+            $this->assertSame(0, $seconds, "Relative expression '$expr' must not be parsed as HTTP-date");
+        }
+
+        // Also test through execution pipeline that +1 hour falls back to configured delay instead of sleeping 180s
+        $mockResponses = [
+            new Response(429, ['Retry-After' => '+1 hour']),
+            function (RequestInterface $request, array $options) {
+                if (array_key_exists('delay', $options) && $options['delay'] === $this->testRetryOption->getDelay() * 1000) {
+                    return new Response(200);
+                }
+                return new \RuntimeException("Expected fallback delay to be set rather than relative expression delay");
+            }
+        ];
+        $response = $this->executeMockRequestWithRetryHandler($mockResponses, $this->testRetryOption);
+        $this->assertEquals(200, $response->getStatusCode());
+    }
+
+    public function testRetryHandlerParsesHttpDatesInNonUtcTimezones(): void
+    {
+        $originalTz = date_default_timezone_get();
+        $ref = new \ReflectionClass(RetryHandler::class);
+        $method = $ref->getMethod('parseRetryAfterToSeconds');
+        $method->setAccessible(true);
+        $handler = new RetryHandler(fn() => \GuzzleHttp\Promise\Create::promiseFor(new Response(200)));
+
+        $testTimezones = ['America/New_York', 'Asia/Tokyo', 'Pacific/Honolulu', 'Europe/Berlin'];
+        try {
+            foreach ($testTimezones as $tz) {
+                date_default_timezone_set($tz);
+
+                $targetTimestamp = time() + 5;
+                $imfDate = gmdate(\DateTimeInterface::RFC7231, $targetTimestamp);
+                $rfc850Date = gmdate('l, d-M-y H:i:s \G\M\T', $targetTimestamp);
+                $asctimeDate = gmdate('D M j H:i:s Y', $targetTimestamp);
+
+                $imfSeconds = $method->invoke($handler, $imfDate);
+                $this->assertGreaterThanOrEqual(4, $imfSeconds, "IMF date under $tz must be within expected delta");
+                $this->assertLessThanOrEqual(5, $imfSeconds, "IMF date under $tz must be within expected delta");
+
+                $rfc850Seconds = $method->invoke($handler, $rfc850Date);
+                $this->assertGreaterThanOrEqual(4, $rfc850Seconds, "RFC 850 date under $tz must be within expected delta");
+                $this->assertLessThanOrEqual(5, $rfc850Seconds, "RFC 850 date under $tz must be within expected delta");
+
+                $asctimeSeconds = $method->invoke($handler, $asctimeDate);
+                $this->assertGreaterThanOrEqual(4, $asctimeSeconds, "asctime date under $tz must be within expected delta");
+                $this->assertLessThanOrEqual(5, $asctimeSeconds, "asctime date under $tz must be within expected delta");
+            }
+        } finally {
+            date_default_timezone_set($originalTz);
+        }
+    }
+
     public function testRetryHandlerCapsDelayAtMaxDelaySeconds(): void
     {
         $ref = new \ReflectionClass(RetryHandler::class);
