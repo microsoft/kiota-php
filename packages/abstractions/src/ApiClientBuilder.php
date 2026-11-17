@@ -67,7 +67,7 @@ class ApiClientBuilder {
 
         if (is_a($original, SerializationWriterFactoryRegistry::class)) {
             self::enableBackingStoreForSerializationWriterRegistry($original);
-        } else {
+        } elseif (!is_a($original, BackingStoreSerializationWriterProxyFactory::class)) {
             $result = new BackingStoreSerializationWriterProxyFactory($original);
         }
         self::enableBackingStoreForSerializationWriterRegistry(SerializationWriterFactoryRegistry::getDefaultInstance());
@@ -83,7 +83,7 @@ class ApiClientBuilder {
         $result = $original;
         if (is_a($original, ParseNodeFactoryRegistry::class)) {
             self::enableBackingStoreForParseNodeRegistry($original);
-        } else {
+        } elseif (!is_a($original, BackingStoreParseNodeFactory::class)) {
             $result = new BackingStoreParseNodeFactory($original);
         }
         self::enableBackingStoreForParseNodeRegistry(ParseNodeFactoryRegistry::getDefaultInstance());
