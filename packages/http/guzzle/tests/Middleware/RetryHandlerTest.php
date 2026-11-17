@@ -99,6 +99,85 @@ class RetryHandlerTest extends TestCase
         $this->assertEquals(200, $response->getStatusCode());
     }
 
+    public function testRetryHandlerDelaysUsingRetryAfterHeaderRfc850DateValue(): void
+    {
+        $retryAfterSecs = (new \DateTime())->getTimestamp() + 2;
+        $retryAfterDate = new \DateTime("@$retryAfterSecs");
+        $mockResponses = [
+            new Response(429, ['Retry-After' => $retryAfterDate->format('l, d-M-y H:i:s \G\M\T')]),
+            function (RequestInterface $request, array $options) {
+                if (array_key_exists('delay', $options) && $options['delay'] > $this->testRetryOption->getDelay() * 1000) {
+                    return new Response(200);
+                }
+                return new \RuntimeException("Expected delay is not set");
+            }
+        ];
+        $response = $this->executeMockRequestWithRetryHandler($mockResponses, $this->testRetryOption);
+        $this->assertEquals(200, $response->getStatusCode());
+    }
+
+    public function testRetryHandlerDelaysUsingRetryAfterHeaderAsctimeDateValue(): void
+    {
+        $retryAfterSecs = (new \DateTime())->getTimestamp() + 2;
+        $retryAfterDate = new \DateTime("@$retryAfterSecs");
+        $mockResponses = [
+            new Response(429, ['Retry-After' => $retryAfterDate->format('D M j H:i:s Y')]),
+            function (RequestInterface $request, array $options) {
+                if (array_key_exists('delay', $options) && $options['delay'] > $this->testRetryOption->getDelay() * 1000) {
+                    return new Response(200);
+                }
+                return new \RuntimeException("Expected delay is not set");
+            }
+        ];
+        $response = $this->executeMockRequestWithRetryHandler($mockResponses, $this->testRetryOption);
+        $this->assertEquals(200, $response->getStatusCode());
+    }
+
+    public function testRetryHandlerPastDateDoesNotProduceNegativeDelay(): void
+    {
+        $mockResponses = [
+            new Response(429, ['Retry-After' => 'Thu, 01 Jan 1970 00:00:00 GMT']),
+            function (RequestInterface $request, array $options) {
+                if (array_key_exists('delay', $options) && $options['delay'] >= 0) {
+                    return new Response(200);
+                }
+                return new \RuntimeException("Expected non-negative delay");
+            }
+        ];
+        $response = $this->executeMockRequestWithRetryHandler($mockResponses, $this->testRetryOption);
+        $this->assertEquals(200, $response->getStatusCode());
+    }
+
+    public function testRetryHandlerNegativeSecondsDoesNotProduceNegativeDelay(): void
+    {
+        $mockResponses = [
+            new Response(429, ['Retry-After' => '-5']),
+            function (RequestInterface $request, array $options) {
+                if (array_key_exists('delay', $options) && $options['delay'] >= 0) {
+                    return new Response(200);
+                }
+                return new \RuntimeException("Expected non-negative delay");
+            }
+        ];
+        $response = $this->executeMockRequestWithRetryHandler($mockResponses, $this->testRetryOption);
+        $this->assertEquals(200, $response->getStatusCode());
+    }
+
+    public function testRetryHandlerTrimmedWhitespaceSeconds(): void
+    {
+        $mockResponses = [
+            new Response(429, ['Retry-After' => '  2  ']),
+            function (RequestInterface $request, array $options) {
+                if (array_key_exists('delay', $options) && $options['delay'] > $this->testRetryOption->getDelay() * 1000) {
+                    return new Response(200);
+                }
+                return new \RuntimeException("Expected delay from trimmed header value");
+            }
+        ];
+        $response = $this->executeMockRequestWithRetryHandler($mockResponses, $this->testRetryOption);
+        $this->assertEquals(200, $response->getStatusCode());
+    }
+
     public function testRetryHandlerDelaysUsingExponentialBackoff()
     {
         $mockResponses = [

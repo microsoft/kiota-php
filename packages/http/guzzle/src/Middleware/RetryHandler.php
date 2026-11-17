@@ -319,21 +319,34 @@ class RetryHandler
     }
 
     /**
-     * Parses Http Retry-After values of type <http-date> of <delay-seconds>
+     * Parses Http Retry-After values of type <http-date> of <delay-seconds> per RFC 9110
      *
      * @param string $retryAfterValue Retry-After value formatted as <http-date> or <delay-seconds>
      * @return int number of seconds
      */
     private function parseRetryAfterToSeconds(string $retryAfterValue): int
     {
-        if (is_numeric($retryAfterValue)) {
-            return intval($retryAfterValue);
+        $trimmed = trim($retryAfterValue);
+        if (is_numeric($trimmed)) {
+            $seconds = intval($trimmed);
+            return max(0, $seconds);
         }
-        $retryAfterDateTime = DateTime::createFromFormat(DateTimeInterface::RFC7231, $retryAfterValue);
+        $retryAfterDateTime = DateTime::createFromFormat(DateTimeInterface::RFC7231, $trimmed);
+        if (!$retryAfterDateTime) {
+            $retryAfterDateTime = DateTime::createFromFormat('l, d-M-y H:i:s \G\M\T', $trimmed)
+                ?: DateTime::createFromFormat('D M j H:i:s Y', $trimmed)
+                ?: DateTime::createFromFormat('D M  j H:i:s Y', $trimmed);
+        }
+        if (!$retryAfterDateTime) {
+            $timestamp = strtotime($trimmed);
+            if ($timestamp !== false) {
+                $retryAfterDateTime = (new DateTime())->setTimestamp($timestamp);
+            }
+        }
         if (!$retryAfterDateTime) {
             throw new RuntimeException("Unable to parse Retry-After header value $retryAfterValue");
         }
-        return $retryAfterDateTime->getTimestamp() - (new DateTime())->getTimestamp();
+        return max(0, $retryAfterDateTime->getTimestamp() - (new DateTime())->getTimestamp());
     }
 
     /**
