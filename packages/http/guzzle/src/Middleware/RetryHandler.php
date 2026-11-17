@@ -244,12 +244,14 @@ class RetryHandler
 
         // First retry attempt
         if ($retries == 0) {
-            return ($retryOption->getDelay() > $retryAfterSeconds) ? $retryOption->getDelay() : $retryAfterSeconds;
+            $delay = ($retryOption->getDelay() > $retryAfterSeconds) ? $retryOption->getDelay() : $retryAfterSeconds;
+            return min($delay, RetryOption::MAX_DELAY_SEC);
         }
 
         $retries++;
         $expoDelay = self::exponentialDelay($retries, $retryOption->getDelay());
-        return ($expoDelay > $retryAfterSeconds) ? $expoDelay : $retryAfterSeconds;
+        $delay = ($expoDelay > $retryAfterSeconds) ? $expoDelay : $retryAfterSeconds;
+        return min($delay, RetryOption::MAX_DELAY_SEC);
     }
 
     /**
@@ -344,7 +346,7 @@ class RetryHandler
             }
         }
         if (!$retryAfterDateTime) {
-            throw new RuntimeException("Unable to parse Retry-After header value $retryAfterValue");
+            return 0;
         }
         return max(0, $retryAfterDateTime->getTimestamp() - (new DateTime())->getTimestamp());
     }

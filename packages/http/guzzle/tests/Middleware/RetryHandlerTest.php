@@ -178,6 +178,64 @@ class RetryHandlerTest extends TestCase
         $this->assertEquals(200, $response->getStatusCode());
     }
 
+    public function testRetryHandlerUnparseableRetryAfterFallsBackToExponentialBackoff(): void
+    {
+        $mockResponses = [
+            new Response(429, ['Retry-After' => 'invalid-date-string']),
+            function (RequestInterface $request, array $options) {
+                if (array_key_exists('delay', $options) && $options['delay'] === $this->testRetryOption->getDelay() * 1000) {
+                    return new Response(200);
+                }
+                return new \RuntimeException("Expected fallback delay to be set");
+            }
+        ];
+        $response = $this->executeMockRequestWithRetryHandler($mockResponses, $this->testRetryOption);
+        $this->assertEquals(200, $response->getStatusCode());
+    }
+
+    public function testRetryHandlerCapsDelayAtMaxDelaySeconds(): void
+    {
+        $ref = new \ReflectionClass(RetryHandler::class);
+        $method = $ref->getMethod('calculateDelay');
+        $method->setAccessible(true);
+        $handler = new RetryHandler(fn() => \GuzzleHttp\Promise\Create::promiseFor(new Response(200)));
+
+        $response = new Response(429, ['Retry-After' => '1000']);
+        $delay = $method->invoke($handler, 0, $response, $this->testRetryOption);
+        $this->assertEquals(RetryOption::MAX_DELAY_SEC, $delay);
+
+        $delayExponential = $method->invoke($handler, 10, null, new RetryOption(10, 50));
+        $this->assertEquals(RetryOption::MAX_DELAY_SEC, $delayExponential);
+    }
+
+    public function testRetryOptionRejectsNegativeMaxRetries(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $option = new RetryOption();
+        $option->setMaxRetries(-1);
+    }
+
+    public function testRetryOptionRejectsExcessiveMaxRetries(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $option = new RetryOption();
+        $option->setMaxRetries(RetryOption::MAX_MAX_RETRIES + 1);
+    }
+
+    public function testRetryOptionRejectsNegativeDelay(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $option = new RetryOption();
+        $option->setDelay(-1);
+    }
+
+    public function testRetryOptionRejectsExcessiveDelay(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $option = new RetryOption();
+        $option->setDelay(RetryOption::MAX_DELAY_SEC + 1);
+    }
+
     public function testRetryHandlerDelaysUsingExponentialBackoff()
     {
         $mockResponses = [
