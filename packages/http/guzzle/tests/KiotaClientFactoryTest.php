@@ -187,4 +187,42 @@ class KiotaClientFactoryTest extends TestCase
         $mockClient = new Client(['handler' => $middlewareStack]);
         $mockClient->get('https://graph.microsoft.com/users?%24top=5');
     }
+
+    public function testDefaultMiddlewarePipelineResilienceWithHeadersInspectionAndRetry(): void
+    {
+        $headersOption = new \Microsoft\Kiota\Http\Middleware\Options\HeadersInspectionHandlerOption(true, true);
+        $retryOption = new RetryOption(2, 1);
+        $futureRfc850 = (new \DateTime('+1 seconds'))->format('l, d-M-y H:i:s \G\M\T');
+
+        $mockResponses = [
+            function (RequestInterface $request) use ($futureRfc850) {
+                return new Response(429, [
+                    'Retry-After' => $futureRfc850,
+                    'x-ms-request-id' => 'retry-attempt-1'
+                ]);
+            },
+            function (RequestInterface $request) {
+                $this->assertSame('1', $request->getHeaderLine('Retry-Attempt'));
+                return new Response(200, [
+                    'x-ms-request-id' => 'final-success',
+                    'content-type' => 'application/json'
+                ]);
+            }
+        ];
+
+        $middlewareStack = KiotaClientFactory::getDefaultHandlerStack();
+        $mockHandler = new MockHandler($mockResponses);
+        $middlewareStack->setHandler($mockHandler);
+        $client = KiotaClientFactory::createWithMiddleware($middlewareStack);
+
+        $response = $client->get('https://graph.microsoft.com/v1.0/me', [
+            \Microsoft\Kiota\Http\Middleware\Options\HeadersInspectionHandlerOption::class => $headersOption,
+            RetryOption::class => $retryOption
+        ]);
+
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertTrue($headersOption->getResponseHeaders()->contains('x-ms-request-id'));
+        $this->assertSame(['final-success'], $headersOption->getResponseHeaders()->get('x-ms-request-id'));
+        $this->assertCount(0, $mockHandler);
+    }
 }
