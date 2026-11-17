@@ -8,6 +8,8 @@
 
 namespace Microsoft\Kiota\Http\Middleware;
 
+use GuzzleHttp\Exception\BadResponseException;
+use GuzzleHttp\Promise\Create;
 use GuzzleHttp\Promise\PromiseInterface;
 use Microsoft\Kiota\Abstractions\RequestHeaders;
 use Microsoft\Kiota\Http\Middleware\Options\HeadersInspectionHandlerOption;
@@ -95,6 +97,17 @@ class HeadersInspectionHandler
                         $headersInspectionOption->setResponseHeaders($responseHeaders);
                     }
                     return $response;
+                },
+                function ($reason) use ($headersInspectionOption) {
+                    if ($reason instanceof BadResponseException) {
+                        $response = $reason->getResponse();
+                        if ($headersInspectionOption->isInspectResponseHeaders()) {
+                            $responseHeaders = new RequestHeaders();
+                            $responseHeaders->putAll($response->getHeaders());
+                            $headersInspectionOption->setResponseHeaders($responseHeaders);
+                        }
+                    }
+                    return Create::rejectionFor($reason);
                 }
             );
         } finally {
