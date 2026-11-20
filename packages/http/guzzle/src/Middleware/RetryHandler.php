@@ -335,10 +335,7 @@ class RetryHandler
             return max(0, $seconds);
         }
         $gmt = new DateTimeZone('GMT');
-        $retryAfterDateTime = $this->createDateTimeFromFormat(DateTimeInterface::RFC7231, $trimmed, $gmt)
-            ?? $this->createDateTimeFromFormat('l, d-M-y H:i:s \G\M\T', $trimmed, $gmt)
-            ?? $this->createDateTimeFromFormat('D M j H:i:s Y', $trimmed, $gmt)
-            ?? $this->createDateTimeFromFormat('D M  j H:i:s Y', $trimmed, $gmt);
+        $retryAfterDateTime = $this->createDateTimeFromFormat(DateTimeInterface::RFC7231, $trimmed, $gmt);
 
         if (!$retryAfterDateTime) {
             return 0;

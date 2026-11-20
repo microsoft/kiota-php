@@ -192,12 +192,12 @@ class KiotaClientFactoryTest extends TestCase
     {
         $headersOption = new \Microsoft\Kiota\Http\Middleware\Options\HeadersInspectionHandlerOption(true, true);
         $retryOption = new RetryOption(2, 1);
-        $futureRfc850 = (new \DateTime('+1 seconds', new \DateTimeZone('GMT')))->format('l, d-M-y H:i:s \G\M\T');
+        $futureHttpDate = (new \DateTime('+1 seconds', new \DateTimeZone('GMT')))->format(\DateTimeInterface::RFC7231);
 
         $mockResponses = [
-            function (RequestInterface $request) use ($futureRfc850) {
+            function (RequestInterface $request) use ($futureHttpDate) {
                 return new Response(429, [
-                    'Retry-After' => $futureRfc850,
+                    'Retry-After' => $futureHttpDate,
                     'x-ms-request-id' => 'retry-attempt-1'
                 ]);
             },
