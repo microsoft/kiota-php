@@ -99,6 +99,69 @@ class RetryHandlerTest extends TestCase
         $this->assertEquals(200, $response->getStatusCode());
     }
 
+    public function testRetryHandlerDelaysUsingRetryAfterHeaderRfc850DateValue(): void
+    {
+        $retryAfterSecs = (new \DateTime())->getTimestamp() + 2;
+        $retryAfterDate = new \DateTime("@$retryAfterSecs");
+        $mockResponses = [
+            new Response(429, ['Retry-After' => $retryAfterDate->format('l, d-M-y H:i:s \G\M\T')]),
+            function (RequestInterface $request, array $options) {
+                if (array_key_exists('delay', $options) && $options['delay'] > $this->testRetryOption->getDelay() * 1000) {
+                    return new Response(200);
+                }
+                return new \RuntimeException("Expected delay is not set");
+            }
+        ];
+        $response = $this->executeMockRequestWithRetryHandler($mockResponses, $this->testRetryOption);
+        $this->assertEquals(200, $response->getStatusCode());
+    }
+
+    public function testRetryHandlerDelaysUsingRetryAfterHeaderAsctimeDateValue(): void
+    {
+        $retryAfterSecs = (new \DateTime())->getTimestamp() + 2;
+        $retryAfterDate = new \DateTime("@$retryAfterSecs");
+        $mockResponses = [
+            new Response(429, ['Retry-After' => $retryAfterDate->format('D M j H:i:s Y')]),
+            function (RequestInterface $request, array $options) {
+                if (array_key_exists('delay', $options) && $options['delay'] > $this->testRetryOption->getDelay() * 1000) {
+                    return new Response(200);
+                }
+                return new \RuntimeException("Expected delay is not set");
+            }
+        ];
+        $response = $this->executeMockRequestWithRetryHandler($mockResponses, $this->testRetryOption);
+        $this->assertEquals(200, $response->getStatusCode());
+    }
+
+    public function testRetryHandlerDelaysUsingRetryAfterHeaderAsctimeSingleDigitDay(): void
+    {
+        $ref = new \ReflectionClass(RetryHandler::class);
+        $method = $ref->getMethod('parseRetryAfterToSeconds');
+        $method->setAccessible(true);
+        $handler = new RetryHandler(fn() => \GuzzleHttp\Promise\Create::promiseFor(new Response(200)));
+
+        $now = new \DateTime('now', new \DateTimeZone('GMT'));
+        $future = (clone $now)->modify('+5 seconds');
+        $formatted = sprintf('%s %s %2d %s', $future->format('D'), $future->format('M'), intval($future->format('j')), $future->format('H:i:s Y'));
+        $seconds = $method->invoke($handler, $formatted);
+        $this->assertGreaterThanOrEqual(4, $seconds);
+        $this->assertLessThanOrEqual(5, $seconds);
+    }
+
+    public function testRetryHandlerRfc850RollingWindow(): void
+    {
+        $ref = new \ReflectionClass(RetryHandler::class);
+        $method = $ref->getMethod('parseRetryAfterToSeconds');
+        $method->setAccessible(true);
+        $handler = new RetryHandler(fn() => \GuzzleHttp\Promise\Create::promiseFor(new Response(200)));
+
+        // A date > 50 years in future is interpreted as past century -> resulting delay is 0
+        $currentYear = intval((new \DateTime('now', new \DateTimeZone('GMT')))->format('Y'));
+        $futureCenturyYear = ($currentYear + 55) % 100;
+        $rfc850FarFuture = sprintf('Sunday, 06-Nov-%02d 08:49:37 GMT', $futureCenturyYear);
+        $seconds = $method->invoke($handler, $rfc850FarFuture);
+        $this->assertSame(0, $seconds, 'RFC 850 date >50 years in the future must map to the past and yield 0 delay');
+    }
 
     public function testRetryHandlerPastDateDoesNotProduceNegativeDelay(): void
     {
@@ -195,8 +258,12 @@ class RetryHandlerTest extends TestCase
         $handler = new RetryHandler(fn() => \GuzzleHttp\Promise\Create::promiseFor(new Response(200)));
 
         $invalidCalendarDates = [
-            'Sun, 31 Nov 2026 12:00:00 GMT', // November has 30 days
-            'Sun, 29 Feb 2025 12:00:00 GMT', // 2025 is not a leap year
+            'Sun, 31 Nov 2026 12:00:00 GMT', // November has 30 days (IMF-fixdate)
+            'Sun, 29 Feb 2025 12:00:00 GMT', // 2025 is not a leap year (IMF-fixdate)
+            'Sunday, 31-Nov-26 12:00:00 GMT', // November has 30 days (RFC 850)
+            'Sunday, 29-Feb-25 12:00:00 GMT', // 2025 is not a leap year (RFC 850)
+            'Tue Nov 31 12:00:00 2026',        // November has 30 days (asctime)
+            'Fri Feb 29 12:00:00 2025',        // 2025 is not a leap year (asctime)
         ];
         foreach ($invalidCalendarDates as $date) {
             $seconds = $method->invoke($handler, $date);
@@ -232,10 +299,20 @@ class RetryHandlerTest extends TestCase
 
                 $targetTimestamp = time() + 5;
                 $imfDate = gmdate(\DateTimeInterface::RFC7231, $targetTimestamp);
+                $rfc850Date = gmdate('l, d-M-y H:i:s \G\M\T', $targetTimestamp);
+                $asctimeDate = gmdate('D M j H:i:s Y', $targetTimestamp);
 
                 $imfSeconds = $method->invoke($handler, $imfDate);
                 $this->assertGreaterThanOrEqual(4, $imfSeconds, "IMF date under $tz must be within expected delta");
                 $this->assertLessThanOrEqual(5, $imfSeconds, "IMF date under $tz must be within expected delta");
+
+                $rfc850Seconds = $method->invoke($handler, $rfc850Date);
+                $this->assertGreaterThanOrEqual(4, $rfc850Seconds, "RFC 850 date under $tz must be within expected delta");
+                $this->assertLessThanOrEqual(5, $rfc850Seconds, "RFC 850 date under $tz must be within expected delta");
+
+                $asctimeSeconds = $method->invoke($handler, $asctimeDate);
+                $this->assertGreaterThanOrEqual(4, $asctimeSeconds, "asctime date under $tz must be within expected delta");
+                $this->assertLessThanOrEqual(5, $asctimeSeconds, "asctime date under $tz must be within expected delta");
             }
         } finally {
             date_default_timezone_set($originalTz);

@@ -335,12 +335,38 @@ class RetryHandler
             return max(0, $seconds);
         }
         $gmt = new DateTimeZone('GMT');
-        $retryAfterDateTime = $this->createDateTimeFromFormat(DateTimeInterface::RFC7231, $trimmed, $gmt);
+        $retryAfterDateTime = $this->createDateTimeFromFormat(DateTimeInterface::RFC7231, $trimmed, $gmt)
+            ?? $this->parseRfc850Date($trimmed, $gmt)
+            ?? $this->createDateTimeFromFormat('D M j H:i:s Y', $trimmed, $gmt)
+            ?? $this->createDateTimeFromFormat('D M  j H:i:s Y', $trimmed, $gmt);
 
         if (!$retryAfterDateTime) {
             return 0;
         }
         return max(0, $retryAfterDateTime->getTimestamp() - (new DateTime('now', $gmt))->getTimestamp());
+    }
+
+    /**
+     * Parses obsolete RFC 850 date format with 50-year rolling window per RFC 9110 section 5.6.7.
+     *
+     * @param string $dateString
+     * @param DateTimeZone $timezone
+     * @return DateTime|null
+     */
+    private function parseRfc850Date(string $dateString, DateTimeZone $timezone): ?DateTime
+    {
+        $dateTime = $this->createDateTimeFromFormat('l, d-M-y H:i:s \G\M\T', $dateString, $timezone);
+        if ($dateTime === null) {
+            return null;
+        }
+        $currentYear = intval((new DateTime('now', $timezone))->format('Y'));
+        $parsedYear = intval($dateTime->format('Y'));
+        if ($parsedYear > $currentYear + 50) {
+            $dateTime->modify('-100 years');
+        } elseif ($parsedYear < $currentYear - 50) {
+            $dateTime->modify('+100 years');
+        }
+        return $dateTime;
     }
 
     /**
