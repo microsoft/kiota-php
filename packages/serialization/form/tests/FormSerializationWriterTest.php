@@ -247,4 +247,35 @@ class FormSerializationWriterTest extends TestCase
         $content = $this->serializationWriter->getSerializedContent();
         $this->assertEquals("body=Hello+world%21%21%21%5Cr%5Ct%5Ct%5Ct%5Cn&body3=Hello+world%21%21%21%5Cr%5Ct%5Ct%5Ct%5Cn", $content->getContents());
     }
+
+    public function testWriteZeroStringKeyPreservesPropertyName(): void
+    {
+        $writer = new FormSerializationWriter();
+        $writer->writeStringValue('0', 'stringValue');
+        $this->assertEquals('0=stringValue', $writer->getSerializedContent()->getContents());
+
+        $writer = new FormSerializationWriter();
+        $writer->writeIntegerValue('0', 42);
+        $this->assertEquals('0=42', $writer->getSerializedContent()->getContents());
+
+        $writer = new FormSerializationWriter();
+        $writer->writeBooleanValue('0', true);
+        $this->assertEquals('0=true', $writer->getSerializedContent()->getContents());
+
+        $writer = new FormSerializationWriter();
+        $writer->writeFloatValue('0', 12.34);
+        $this->assertEquals('0=12.34', $writer->getSerializedContent()->getContents());
+
+        $writer = new FormSerializationWriter();
+        $writer->writeDateValue('0', Date::createFrom(2026, 11, 17));
+        $this->assertEquals('0=2026-11-17', $writer->getSerializedContent()->getContents());
+
+        $writer = new FormSerializationWriter();
+        $writer->writeTimeValue('0', Time::createFrom(14, 30, 0));
+        $this->assertEquals('0=14:30:00', $writer->getSerializedContent()->getContents());
+
+        $writer = new FormSerializationWriter();
+        $writer->writeEnumValue('0', new MaritalStatus('married'));
+        $this->assertEquals('0=married', $writer->getSerializedContent()->getContents());
+    }
 }

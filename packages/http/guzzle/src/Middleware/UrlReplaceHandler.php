@@ -63,7 +63,7 @@ class UrlReplaceHandler
         $newUri = $request->getUri();
         $path = $newUri->getPath();
         foreach ($urlReplaceOption->getReplacementPairs() as $key => $replacementValue) {
-            $result = preg_replace('/'.urlencode($key).'/', urlencode($replacementValue), urlencode($path), 1);
+            $result = preg_replace('/' . preg_quote(urlencode($key), '/') . '/', urlencode($replacementValue), urlencode($path), 1);
 
             if (is_string($result)) {
                 $newUri = $newUri->withPath(urldecode($result));

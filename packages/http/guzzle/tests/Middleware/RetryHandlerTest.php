@@ -99,6 +99,269 @@ class RetryHandlerTest extends TestCase
         $this->assertEquals(200, $response->getStatusCode());
     }
 
+    public function testRetryHandlerDelaysUsingRetryAfterHeaderRfc850DateValue(): void
+    {
+        $retryAfterSecs = (new \DateTime())->getTimestamp() + 2;
+        $retryAfterDate = new \DateTime("@$retryAfterSecs");
+        $mockResponses = [
+            new Response(429, ['Retry-After' => $retryAfterDate->format('l, d-M-y H:i:s \G\M\T')]),
+            function (RequestInterface $request, array $options) {
+                if (array_key_exists('delay', $options) && $options['delay'] > $this->testRetryOption->getDelay() * 1000) {
+                    return new Response(200);
+                }
+                return new \RuntimeException("Expected delay is not set");
+            }
+        ];
+        $response = $this->executeMockRequestWithRetryHandler($mockResponses, $this->testRetryOption);
+        $this->assertEquals(200, $response->getStatusCode());
+    }
+
+    public function testRetryHandlerDelaysUsingRetryAfterHeaderAsctimeDateValue(): void
+    {
+        $retryAfterSecs = (new \DateTime())->getTimestamp() + 2;
+        $retryAfterDate = new \DateTime("@$retryAfterSecs");
+        $mockResponses = [
+            new Response(429, ['Retry-After' => $retryAfterDate->format('D M j H:i:s Y')]),
+            function (RequestInterface $request, array $options) {
+                if (array_key_exists('delay', $options) && $options['delay'] > $this->testRetryOption->getDelay() * 1000) {
+                    return new Response(200);
+                }
+                return new \RuntimeException("Expected delay is not set");
+            }
+        ];
+        $response = $this->executeMockRequestWithRetryHandler($mockResponses, $this->testRetryOption);
+        $this->assertEquals(200, $response->getStatusCode());
+    }
+
+    public function testRetryHandlerDelaysUsingRetryAfterHeaderAsctimeSingleDigitDay(): void
+    {
+        $ref = new \ReflectionClass(RetryHandler::class);
+        $method = $ref->getMethod('parseRetryAfterToSeconds');
+        $method->setAccessible(true);
+        $handler = new RetryHandler(fn() => \GuzzleHttp\Promise\Create::promiseFor(new Response(200)));
+
+        $now = new \DateTime('now', new \DateTimeZone('GMT'));
+        $future = (clone $now)->modify('+5 seconds');
+        $formatted = sprintf('%s %s %2d %s', $future->format('D'), $future->format('M'), intval($future->format('j')), $future->format('H:i:s Y'));
+        $seconds = $method->invoke($handler, $formatted);
+        $this->assertGreaterThanOrEqual(4, $seconds);
+        $this->assertLessThanOrEqual(5, $seconds);
+    }
+
+    public function testRetryHandlerRfc850RollingWindow(): void
+    {
+        $ref = new \ReflectionClass(RetryHandler::class);
+        $method = $ref->getMethod('parseRetryAfterToSeconds');
+        $method->setAccessible(true);
+        $handler = new RetryHandler(fn() => \GuzzleHttp\Promise\Create::promiseFor(new Response(200)));
+
+        // A date > 50 years in future is interpreted as past century -> resulting delay is 0
+        $currentYear = intval((new \DateTime('now', new \DateTimeZone('GMT')))->format('Y'));
+        $futureCenturyYear = ($currentYear + 55) % 100;
+        $rfc850FarFuture = sprintf('Sunday, 06-Nov-%02d 08:49:37 GMT', $futureCenturyYear);
+        $seconds = $method->invoke($handler, $rfc850FarFuture);
+        $this->assertSame(0, $seconds, 'RFC 850 date >50 years in the future must map to the past and yield 0 delay');
+    }
+
+    public function testRetryHandlerPastDateDoesNotProduceNegativeDelay(): void
+    {
+        $mockResponses = [
+            new Response(429, ['Retry-After' => 'Thu, 01 Jan 1970 00:00:00 GMT']),
+            function (RequestInterface $request, array $options) {
+                if (array_key_exists('delay', $options) && $options['delay'] >= 0) {
+                    return new Response(200);
+                }
+                return new \RuntimeException("Expected non-negative delay");
+            }
+        ];
+        $response = $this->executeMockRequestWithRetryHandler($mockResponses, $this->testRetryOption);
+        $this->assertEquals(200, $response->getStatusCode());
+    }
+
+    public function testRetryHandlerNegativeSecondsDoesNotProduceNegativeDelay(): void
+    {
+        $mockResponses = [
+            new Response(429, ['Retry-After' => '-5']),
+            function (RequestInterface $request, array $options) {
+                if (array_key_exists('delay', $options) && $options['delay'] >= 0) {
+                    return new Response(200);
+                }
+                return new \RuntimeException("Expected non-negative delay");
+            }
+        ];
+        $response = $this->executeMockRequestWithRetryHandler($mockResponses, $this->testRetryOption);
+        $this->assertEquals(200, $response->getStatusCode());
+    }
+
+    public function testRetryHandlerTrimmedWhitespaceSeconds(): void
+    {
+        $mockResponses = [
+            new Response(429, ['Retry-After' => '  2  ']),
+            function (RequestInterface $request, array $options) {
+                if (array_key_exists('delay', $options) && $options['delay'] > $this->testRetryOption->getDelay() * 1000) {
+                    return new Response(200);
+                }
+                return new \RuntimeException("Expected delay from trimmed header value");
+            }
+        ];
+        $response = $this->executeMockRequestWithRetryHandler($mockResponses, $this->testRetryOption);
+        $this->assertEquals(200, $response->getStatusCode());
+    }
+
+    public function testRetryHandlerUnparseableRetryAfterFallsBackToExponentialBackoff(): void
+    {
+        $mockResponses = [
+            new Response(429, ['Retry-After' => 'invalid-date-string']),
+            function (RequestInterface $request, array $options) {
+                if (array_key_exists('delay', $options) && $options['delay'] === $this->testRetryOption->getDelay() * 1000) {
+                    return new Response(200);
+                }
+                return new \RuntimeException("Expected fallback delay to be set");
+            }
+        ];
+        $response = $this->executeMockRequestWithRetryHandler($mockResponses, $this->testRetryOption);
+        $this->assertEquals(200, $response->getStatusCode());
+    }
+
+    public function testRetryHandlerRejectsRelativeDateExpressions(): void
+    {
+        $ref = new \ReflectionClass(RetryHandler::class);
+        $method = $ref->getMethod('parseRetryAfterToSeconds');
+        $method->setAccessible(true);
+        $handler = new RetryHandler(fn() => \GuzzleHttp\Promise\Create::promiseFor(new Response(200)));
+
+        $relativeExpressions = ['+1 hour', '+120 seconds', 'next Monday', 'now', 'tomorrow'];
+        foreach ($relativeExpressions as $expr) {
+            $seconds = $method->invoke($handler, $expr);
+            $this->assertSame(0, $seconds, "Relative expression '$expr' must not be parsed as HTTP-date");
+        }
+
+        // Also test through execution pipeline that +1 hour falls back to configured delay instead of sleeping 180s
+        $mockResponses = [
+            new Response(429, ['Retry-After' => '+1 hour']),
+            function (RequestInterface $request, array $options) {
+                if (array_key_exists('delay', $options) && $options['delay'] === $this->testRetryOption->getDelay() * 1000) {
+                    return new Response(200);
+                }
+                return new \RuntimeException("Expected fallback delay to be set rather than relative expression delay");
+            }
+        ];
+        $response = $this->executeMockRequestWithRetryHandler($mockResponses, $this->testRetryOption);
+        $this->assertEquals(200, $response->getStatusCode());
+    }
+
+    public function testRetryHandlerRejectsInvalidCalendarDates(): void
+    {
+        $ref = new \ReflectionClass(RetryHandler::class);
+        $method = $ref->getMethod('parseRetryAfterToSeconds');
+        $method->setAccessible(true);
+        $handler = new RetryHandler(fn() => \GuzzleHttp\Promise\Create::promiseFor(new Response(200)));
+
+        $invalidCalendarDates = [
+            'Sun, 31 Nov 2026 12:00:00 GMT', // November has 30 days (IMF-fixdate)
+            'Sun, 29 Feb 2025 12:00:00 GMT', // 2025 is not a leap year (IMF-fixdate)
+            'Sunday, 31-Nov-26 12:00:00 GMT', // November has 30 days (RFC 850)
+            'Sunday, 29-Feb-25 12:00:00 GMT', // 2025 is not a leap year (RFC 850)
+            'Tue Nov 31 12:00:00 2026',        // November has 30 days (asctime)
+            'Fri Feb 29 12:00:00 2025',        // 2025 is not a leap year (asctime)
+        ];
+        foreach ($invalidCalendarDates as $date) {
+            $seconds = $method->invoke($handler, $date);
+            $this->assertSame(0, $seconds, "Invalid calendar date '$date' must be rejected and return 0");
+        }
+
+        // Test that request with an invalid calendar date falls back to configured exponential delay instead of a future sleep
+        $mockResponses = [
+            new Response(429, ['Retry-After' => 'Sun, 31 Nov 2026 12:00:00 GMT']),
+            function (RequestInterface $request, array $options) {
+                if (array_key_exists('delay', $options) && $options['delay'] === $this->testRetryOption->getDelay() * 1000) {
+                    return new Response(200);
+                }
+                return new \RuntimeException("Expected fallback delay to be set rather than invalid calendar date delay");
+            }
+        ];
+        $response = $this->executeMockRequestWithRetryHandler($mockResponses, $this->testRetryOption);
+        $this->assertEquals(200, $response->getStatusCode());
+    }
+
+    public function testRetryHandlerParsesHttpDatesInNonUtcTimezones(): void
+    {
+        $originalTz = date_default_timezone_get();
+        $ref = new \ReflectionClass(RetryHandler::class);
+        $method = $ref->getMethod('parseRetryAfterToSeconds');
+        $method->setAccessible(true);
+        $handler = new RetryHandler(fn() => \GuzzleHttp\Promise\Create::promiseFor(new Response(200)));
+
+        $testTimezones = ['America/New_York', 'Asia/Tokyo', 'Pacific/Honolulu', 'Europe/Berlin'];
+        try {
+            foreach ($testTimezones as $tz) {
+                date_default_timezone_set($tz);
+
+                $targetTimestamp = time() + 5;
+                $imfDate = gmdate(\DateTimeInterface::RFC7231, $targetTimestamp);
+                $rfc850Date = gmdate('l, d-M-y H:i:s \G\M\T', $targetTimestamp);
+                $asctimeDate = gmdate('D M j H:i:s Y', $targetTimestamp);
+
+                $imfSeconds = $method->invoke($handler, $imfDate);
+                $this->assertGreaterThanOrEqual(4, $imfSeconds, "IMF date under $tz must be within expected delta");
+                $this->assertLessThanOrEqual(5, $imfSeconds, "IMF date under $tz must be within expected delta");
+
+                $rfc850Seconds = $method->invoke($handler, $rfc850Date);
+                $this->assertGreaterThanOrEqual(4, $rfc850Seconds, "RFC 850 date under $tz must be within expected delta");
+                $this->assertLessThanOrEqual(5, $rfc850Seconds, "RFC 850 date under $tz must be within expected delta");
+
+                $asctimeSeconds = $method->invoke($handler, $asctimeDate);
+                $this->assertGreaterThanOrEqual(4, $asctimeSeconds, "asctime date under $tz must be within expected delta");
+                $this->assertLessThanOrEqual(5, $asctimeSeconds, "asctime date under $tz must be within expected delta");
+            }
+        } finally {
+            date_default_timezone_set($originalTz);
+        }
+    }
+
+    public function testRetryHandlerCapsDelayAtMaxDelaySeconds(): void
+    {
+        $ref = new \ReflectionClass(RetryHandler::class);
+        $method = $ref->getMethod('calculateDelay');
+        $method->setAccessible(true);
+        $handler = new RetryHandler(fn() => \GuzzleHttp\Promise\Create::promiseFor(new Response(200)));
+
+        $response = new Response(429, ['Retry-After' => '1000']);
+        $delay = $method->invoke($handler, 0, $response, $this->testRetryOption);
+        $this->assertEquals(RetryOption::MAX_DELAY_SEC, $delay);
+
+        $delayExponential = $method->invoke($handler, 10, null, new RetryOption(10, 50));
+        $this->assertEquals(RetryOption::MAX_DELAY_SEC, $delayExponential);
+    }
+
+    public function testRetryOptionRejectsNegativeMaxRetries(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $option = new RetryOption();
+        $option->setMaxRetries(-1);
+    }
+
+    public function testRetryOptionRejectsExcessiveMaxRetries(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $option = new RetryOption();
+        $option->setMaxRetries(RetryOption::MAX_MAX_RETRIES + 1);
+    }
+
+    public function testRetryOptionRejectsNegativeDelay(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $option = new RetryOption();
+        $option->setDelay(-1);
+    }
+
+    public function testRetryOptionRejectsExcessiveDelay(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $option = new RetryOption();
+        $option->setDelay(RetryOption::MAX_DELAY_SEC + 1);
+    }
+
     public function testRetryHandlerDelaysUsingExponentialBackoff()
     {
         $mockResponses = [

@@ -79,6 +79,32 @@ class UrlReplaceHandlerTest extends TestCase
         $this->executeMockRequest($mockResponse, $urlReplaceOption, $url);
     }
 
+    public function testUriReplaceWithDotInKeyDoesNotMatchWildcard(): void
+    {
+        $nonMatchingUrl = 'https://graph.microsoft.com/v1X0/users';
+        $matchingUrl = 'https://graph.microsoft.com/v1.0/users';
+        $expectedUrl = 'https://graph.microsoft.com/v2.0/users';
+
+        // 1. Non-matching wildcard should not be replaced
+        $mockResponse1 = [
+            function (RequestInterface $request, array $options) use ($nonMatchingUrl) {
+                $this->assertEquals($nonMatchingUrl, strval($request->getUri()));
+                return new Response(200);
+            }
+        ];
+        $urlReplaceOption = new UrlReplaceOption(true, ['/v1.0/users' => '/v2.0/users']);
+        $this->executeMockRequest($mockResponse1, $urlReplaceOption, $nonMatchingUrl);
+
+        // 2. Exact match should be replaced
+        $mockResponse2 = [
+            function (RequestInterface $request, array $options) use ($expectedUrl) {
+                $this->assertEquals($expectedUrl, strval($request->getUri()));
+                return new Response(200);
+            }
+        ];
+        $this->executeMockRequest($mockResponse2, $urlReplaceOption, $matchingUrl);
+    }
+
     /**
      * @param array $mockResponses
      * @param ParametersDecodingOption|null $decodingOption

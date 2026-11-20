@@ -10,6 +10,7 @@ namespace Microsoft\Kiota\Http\Middleware;
 
 use DateTime;
 use DateTimeInterface;
+use DateTimeZone;
 use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Promise\Create;
 use GuzzleHttp\Promise\PromiseInterface;
@@ -244,12 +245,14 @@ class RetryHandler
 
         // First retry attempt
         if ($retries == 0) {
-            return ($retryOption->getDelay() > $retryAfterSeconds) ? $retryOption->getDelay() : $retryAfterSeconds;
+            $delay = ($retryOption->getDelay() > $retryAfterSeconds) ? $retryOption->getDelay() : $retryAfterSeconds;
+            return min($delay, RetryOption::MAX_DELAY_SEC);
         }
 
         $retries++;
         $expoDelay = self::exponentialDelay($retries, $retryOption->getDelay());
-        return ($expoDelay > $retryAfterSeconds) ? $expoDelay : $retryAfterSeconds;
+        $delay = ($expoDelay > $retryAfterSeconds) ? $expoDelay : $retryAfterSeconds;
+        return min($delay, RetryOption::MAX_DELAY_SEC);
     }
 
     /**
@@ -319,21 +322,72 @@ class RetryHandler
     }
 
     /**
-     * Parses Http Retry-After values of type <http-date> of <delay-seconds>
+     * Parses Http Retry-After values of type <http-date> of <delay-seconds> per RFC 9110
      *
      * @param string $retryAfterValue Retry-After value formatted as <http-date> or <delay-seconds>
      * @return int number of seconds
      */
     private function parseRetryAfterToSeconds(string $retryAfterValue): int
     {
-        if (is_numeric($retryAfterValue)) {
-            return intval($retryAfterValue);
+        $trimmed = trim($retryAfterValue);
+        if (is_numeric($trimmed)) {
+            $seconds = intval($trimmed);
+            return max(0, $seconds);
         }
-        $retryAfterDateTime = DateTime::createFromFormat(DateTimeInterface::RFC7231, $retryAfterValue);
+        $gmt = new DateTimeZone('GMT');
+        $retryAfterDateTime = $this->createDateTimeFromFormat(DateTimeInterface::RFC7231, $trimmed, $gmt)
+            ?? $this->parseRfc850Date($trimmed, $gmt)
+            ?? $this->createDateTimeFromFormat('D M j H:i:s Y', $trimmed, $gmt)
+            ?? $this->createDateTimeFromFormat('D M  j H:i:s Y', $trimmed, $gmt);
+
         if (!$retryAfterDateTime) {
-            throw new RuntimeException("Unable to parse Retry-After header value $retryAfterValue");
+            return 0;
         }
-        return $retryAfterDateTime->getTimestamp() - (new DateTime())->getTimestamp();
+        return max(0, $retryAfterDateTime->getTimestamp() - (new DateTime('now', $gmt))->getTimestamp());
+    }
+
+    /**
+     * Parses obsolete RFC 850 date format with 50-year rolling window per RFC 9110 section 5.6.7.
+     *
+     * @param string $dateString
+     * @param DateTimeZone $timezone
+     * @return DateTime|null
+     */
+    private function parseRfc850Date(string $dateString, DateTimeZone $timezone): ?DateTime
+    {
+        $dateTime = $this->createDateTimeFromFormat('l, d-M-y H:i:s \G\M\T', $dateString, $timezone);
+        if ($dateTime === null) {
+            return null;
+        }
+        $currentYear = intval((new DateTime('now', $timezone))->format('Y'));
+        $parsedYear = intval($dateTime->format('Y'));
+        if ($parsedYear > $currentYear + 50) {
+            $dateTime->modify('-100 years');
+        } elseif ($parsedYear < $currentYear - 50) {
+            $dateTime->modify('+100 years');
+        }
+        return $dateTime;
+    }
+
+    /**
+     * Creates a DateTime from format ensuring no parsing errors or calendar overflow warnings occurred.
+     *
+     * @param string $format
+     * @param string $dateString
+     * @param DateTimeZone $timezone
+     * @return DateTime|null
+     */
+    private function createDateTimeFromFormat(string $format, string $dateString, DateTimeZone $timezone): ?DateTime
+    {
+        $dateTime = DateTime::createFromFormat($format, $dateString, $timezone);
+        if ($dateTime === false) {
+            return null;
+        }
+        $errors = DateTime::getLastErrors();
+        if ($errors !== false && ($errors['warning_count'] > 0 || $errors['error_count'] > 0)) {
+            return null;
+        }
+        return $dateTime;
     }
 
     /**
