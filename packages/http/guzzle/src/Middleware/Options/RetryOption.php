@@ -27,11 +27,11 @@ class RetryOption implements RequestOption
     /**
      * Upper limit on {@link $maxRetries}
      */
-    private const MAX_MAX_RETRIES = 10;
+    public const MAX_MAX_RETRIES = 10;
     /**
      * Upper limit on {@link $delaySeconds}
      */
-    private const MAX_DELAY_SEC = 180;
+    public const MAX_DELAY_SEC = 180;
 
     /**
      * @var int Max number of times a request can be resent
@@ -98,8 +98,8 @@ class RetryOption implements RequestOption
      */
     public function setMaxRetries(int $maxRetries): self
     {
-        if ($maxRetries > self::MAX_MAX_RETRIES) {
-            throw new \InvalidArgumentException("Max retries exceeded maximum limit of ".self::MAX_MAX_RETRIES);
+        if ($maxRetries < 0 || $maxRetries > self::MAX_MAX_RETRIES) {
+            throw new \InvalidArgumentException("Max retries must be between 0 and ".self::MAX_MAX_RETRIES);
         }
         $this->maxRetries = $maxRetries;
         return $this;
@@ -121,8 +121,8 @@ class RetryOption implements RequestOption
      */
     public function setDelay(int $delaySeconds): self
     {
-        if ($delaySeconds > self::MAX_DELAY_SEC) {
-            throw new \InvalidArgumentException("Delay exceeds max delay limit of ".self::MAX_DELAY_SEC);
+        if ($delaySeconds < 0 || $delaySeconds > self::MAX_DELAY_SEC) {
+            throw new \InvalidArgumentException("Delay must be between 0 and ".self::MAX_DELAY_SEC);
         }
         $this->delaySeconds = $delaySeconds;
         return $this;

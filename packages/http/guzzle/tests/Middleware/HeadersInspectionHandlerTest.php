@@ -64,6 +64,57 @@ class HeadersInspectionHandlerTest extends TestCase
         $this->assertEquals(self::$responseHeaders, $option->getResponseHeaders()->getAll());
     }
 
+    public function testResponseHeadersCapturedOnBadResponseException(): void
+    {
+        $option = new HeadersInspectionHandlerOption(true, true);
+        $errorResponseHeaders = [
+            'www-authenticate' => ['Bearer error="invalid_token"'],
+            'x-ms-request-id' => ['abc-123']
+        ];
+        $mockHandler = new MockHandler([
+            new Response(401, $errorResponseHeaders)
+        ]);
+        $handlerStack = HandlerStack::create($mockHandler);
+        $handlerStack->push(KiotaMiddleware::headersInspection($option));
+        $client = new Client(['handler' => $handlerStack, 'http_errors' => true]);
+
+        try {
+            $client->request('GET', '/', ['headers' => self::$requestHeaders]);
+            $this->fail("Expected BadResponseException was not thrown");
+        } catch (\GuzzleHttp\Exception\BadResponseException $ex) {
+            $this->assertEquals(401, $ex->getResponse()->getStatusCode());
+        }
+
+        $this->assertEquals(self::$requestHeaders, $option->getRequestHeaders()->getAll());
+        $this->assertEquals($errorResponseHeaders, $option->getResponseHeaders()->getAll());
+    }
+
+    public function testResponseHeadersCapturedOnDirectBadResponseException(): void
+    {
+        $option = new HeadersInspectionHandlerOption(true, true);
+        $errorResponseHeaders = [
+            'www-authenticate' => ['Bearer error="invalid_token"']
+        ];
+        $request = new \GuzzleHttp\Psr7\Request('GET', '/');
+        $response = new Response(401, $errorResponseHeaders);
+        $mockHandler = new MockHandler([
+            new \GuzzleHttp\Exception\BadResponseException('Unauthorized', $request, $response)
+        ]);
+        $handlerStack = new HandlerStack($mockHandler);
+        $handlerStack->push(KiotaMiddleware::headersInspection($option));
+        $client = new Client(['handler' => $handlerStack]);
+
+        try {
+            $client->request('GET', '/', ['headers' => self::$requestHeaders]);
+            $this->fail("Expected BadResponseException was not thrown");
+        } catch (\GuzzleHttp\Exception\BadResponseException $ex) {
+            $this->assertEquals(401, $ex->getResponse()->getStatusCode());
+        }
+
+        $this->assertEquals(self::$requestHeaders, $option->getRequestHeaders()->getAll());
+        $this->assertEquals($errorResponseHeaders, $option->getResponseHeaders()->getAll());
+    }
+
     public function testPerRequestOptionDoesNotLeakToSubsequentRequests(): void
     {
         $handlerOption = new HeadersInspectionHandlerOption(false, false);
